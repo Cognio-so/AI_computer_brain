@@ -1,0 +1,63 @@
+services:
+  brain-server:
+    build: .
+    container_name: ai-computer-brain
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - BRAIN_HOST=0.0.0.0
+      - BRAIN_PORT=8000
+      - BRAIN_FILES_DIR=/app/brain_files
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:////data/brain_metadata.db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+    volumes:
+      - brain_data:/data
+      - ./brain_files:/app/brain_files
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - brain-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: brain-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - brain-net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: brain-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - BRAIN_DOMAIN=${BRAIN_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - brain-server
+    networks:
+      - brain-net
+
+volumes:
+  brain_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  brain-net:
+    driver: bridge

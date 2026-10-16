@@ -1,0 +1,18 @@
+services:
+  brain-server:
+    build: .
+    container_name: ai-computer-brain-local
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - BRAIN_HOST=0.0.0.0
+      - BRAIN_PORT=8000
+      - PUBLIC_URL=${PUBLIC_URL:-http://localhost:8000}
+      - BRAIN_FILES_DIR=/app/brain_files
+      - DATABASE_URL=sqlite+aiosqlite:////data/brain_metadata.db
+      - REDIS_URL=
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+      - ./brain_files:/app/brain_files

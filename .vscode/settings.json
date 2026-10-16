@@ -1,0 +1,11 @@
+{
+  "git.autoRepositoryDetection": "openEditors",
+  "git.detectSubmodules": false,
+  "git.repositoryScanIgnoredFolders": ["node_modules", "brain_files", "data", ".venv", ".pytest_tmp"],
+  "search.exclude": {
+    "**/.venv": true,
+    "**/.pytest_tmp": true,
+    "**/brain_files": true,
+    "**/data": true
+  }
+}

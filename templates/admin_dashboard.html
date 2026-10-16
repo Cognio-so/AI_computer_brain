@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="brain-api-base" content="">
+<meta name="color-scheme" content="dark light">
+<title>AI Computer Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<style>
+:root{
+  --accent:#38bdf8;--accent-2:#a78bfa;--accent-ink:#06121a;
+  --bg:#0b0f14;--surface:#11171f;--surface-2:#182029;--surface-3:#1f2933;--border:#27313d;--border-strong:#36424f;
+  --ink:#e8eef4;--ink-2:#b7c2cd;--muted:#8d9aa8;--ok:#34d399;--warn:#fbbf24;--danger:#f87171;--danger-ink:#ffd4d4;
+  --shadow:0 10px 30px rgba(0,0,0,.35);--radius:10px;--radius-sm:7px;
+  --z-dropdown:10;--z-sticky:20;--z-backdrop:30;--z-modal:40;--z-toast:50;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#f3f5f8;--surface:#ffffff;--surface-2:#f6f8fa;--surface-3:#eef1f5;--border:#d9dfe7;--border-strong:#c3ccd6;
+  --ink:#14202b;--ink-2:#3a4855;--muted:#5d6b78;--ok:#15803d;--warn:#b45309;--danger:#b91c1c;--danger-ink:#7f1d1d;
+  --shadow:0 10px 30px rgba(20,32,43,.10);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased;text-wrap:pretty}
+[x-cloak]{display:none!important}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:22px}h2{font-size:17px}h3{font-size:15px}
+p{margin:0}
+.mono{font-family:var(--mono);font-size:12.5px}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface-2);border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:9px 11px;width:100%;outline:none;transition:border-color .15s}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+textarea{font-family:var(--mono);font-size:12.5px;line-height:1.55;resize:vertical;min-height:160px}
+label.field{display:block}
+label.field>span{display:block;font-size:12.5px;font-weight:500;color:var(--ink-2);margin-bottom:5px}
+label.field .hint{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink);border-radius:var(--radius-sm);padding:8px 13px;font-weight:500;white-space:nowrap;transition:background .15s,border-color .15s,transform .15s}
+.btn:hover{background:var(--surface-3);border-color:var(--accent)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:color-mix(in srgb,var(--accent) 85%,white);border-color:var(--accent)}
+.btn-danger{border-color:color-mix(in srgb,var(--danger) 60%,var(--border-strong));color:var(--danger)}
+.btn-danger:hover{background:color-mix(in srgb,var(--danger) 12%,transparent);border-color:var(--danger)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn-ghost:hover{background:var(--surface-3);border-color:transparent;color:var(--ink)}
+.btn-sm{padding:5px 10px;font-size:12.5px}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface-2);color:var(--ink-2)}
+.chip-ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--border))}
+.chip-warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,var(--border))}
+.chip-danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+.chip-accent{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.dot-ok{background:var(--ok)}.dot-warn{background:var(--warn)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.card-pad{padding:18px 20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);letter-spacing:.01em}
+td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
+.empty{padding:34px 20px;text-align:center;color:var(--muted)}
+.key-box{background:#0a0e13;color:#d7fbe8;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:12px 14px;font-family:var(--mono);font-size:12.5px;word-break:break-all;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+:root[data-theme="light"] .key-box{background:#14202b;color:#d7fbe8}
+pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:12px 14px;font-family:var(--mono);font-size:12.5px;line-height:1.55;overflow:auto}
+:root[data-theme="light"] pre{background:#14202b}
+.scroll::-webkit-scrollbar{width:8px;height:8px}.scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:1px solid var(--border);background:transparent;border-radius:999px;padding:4px 12px;font-size:12.5px;color:var(--ink-2)}
+.tab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.app{min-height:100%;display:grid;grid-template-rows:auto 1fr}
+.topbar{position:sticky;top:0;z-index:var(--z-sticky);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 20px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand svg{display:block}
+.brand strong{font-weight:600;letter-spacing:-.01em}
+.layout{display:grid;grid-template-columns:248px 1fr;min-height:0}
+.sidebar{border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;gap:18px;background:var(--surface)}
+.side-title{font-size:12px;font-weight:600;color:var(--muted);padding:0 8px;display:flex;justify-content:space-between;align-items:center}
+.project-item{display:block;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:var(--radius-sm);padding:8px 10px;color:var(--ink-2)}
+.project-item:hover{background:var(--surface-2);color:var(--ink)}
+.project-item.on{background:var(--surface-2);border-color:var(--border-strong);color:var(--ink)}
+.project-item .name{font-weight:500;display:block}
+.project-item .meta{font-size:12px;color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;border:0;background:transparent;border-radius:var(--radius-sm);padding:8px 10px;color:var(--ink-2)}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink);font-weight:500}
+.badge{min-width:20px;height:20px;border-radius:999px;background:var(--warn);color:#1a1200;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.main{padding:24px 28px 60px;min-width:0}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 16px;align-items:baseline}
+.kv dt{color:var(--muted);font-size:12.5px}
+.kv dd{margin:0;min-width:0;word-break:break-word}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{display:grid;grid-template-columns:62px 1fr;gap:14px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+.timeline li:hover{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
+.timeline li:last-child{border-bottom:0}
+.timeline time{color:var(--muted);font-size:12px;font-family:var(--mono);padding-top:2px}
+.actor{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.prose{max-width:72ch;line-height:1.6}
+.prose h1,.prose h2,.prose h3{margin:1.2em 0 .5em}
+.prose h1{font-size:20px}.prose h2{font-size:16px;padding-bottom:5px;border-bottom:1px solid var(--border)}.prose h3{font-size:14px}
+.prose p,.prose ul,.prose ol{margin:.6em 0}
+.prose code{font-family:var(--mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.prose pre code{background:transparent;border:0;padding:0}
+.prose table{margin:.8em 0;font-size:13px}.prose th,.prose td{padding:6px 10px}
+.prose blockquote{margin:.8em 0;padding:4px 14px;color:var(--ink-2);background:var(--surface-2);border-radius:var(--radius-sm)}
+.section-list button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:var(--radius-sm);padding:6px 9px;color:var(--ink-2);font-size:12.5px}
+.section-list button:hover{background:var(--surface-2);color:var(--ink)}
+.section-list button.sub{padding-left:22px}
+.drop{border:1px dashed var(--border-strong);border-radius:var(--radius);padding:22px;text-align:center;color:var(--muted);transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.toasts{position:fixed;top:14px;right:14px;z-index:var(--z-toast);display:flex;flex-direction:column;gap:8px;width:min(360px,calc(100vw - 28px))}
+.toast{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:10px 14px;box-shadow:var(--shadow);font-size:13px;animation:toast-in .2s cubic-bezier(.16,1,.3,1)}
+.toast.error{border-color:var(--danger);color:var(--danger-ink)}
+.toast.ok{border-color:color-mix(in srgb,var(--ok) 60%,var(--border-strong))}
+@keyframes toast-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:var(--z-backdrop);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);box-shadow:var(--shadow);width:min(560px,100%);z-index:var(--z-modal);animation:toast-in .2s cubic-bezier(.16,1,.3,1)}
+.auth{min-height:100%;display:grid;place-items:center;padding:24px}
+.auth form{width:min(420px,100%)}
+.steps{display:grid;grid-template-columns:28px 1fr;gap:8px 10px}
+.steps b{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--surface-3);color:var(--ink-2);align-items:center;justify-content:center;font-size:12px}
+.progress{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:12.5px}
+.progress li{padding:4px 0;border-bottom:1px dashed var(--border);display:flex;gap:10px}
+.progress li span:first-child{color:var(--muted)}
+.files-layout{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:16px;align-items:start}
+.file-item{display:block;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:var(--radius-sm);padding:9px 11px;color:var(--ink-2)}
+.file-item:hover{background:var(--surface-2);color:var(--ink)}
+.file-item.on{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border));color:var(--ink)}
+.file-item .name{font-family:var(--mono);font-size:12.5px;font-weight:500;display:block}
+.file-item .meta{font-size:12px;color:var(--muted)}
+.toc{display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.toc button{border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:4px 11px;font-size:12.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
+.toc button:hover{border-color:var(--accent);color:var(--ink)}
+.toc button.sub{opacity:.85;font-size:12px}
+.toc button .etag{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.prose table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:.9em 0;font-size:13px}
+.prose thead th{background:var(--surface-2);font-weight:600;color:var(--ink)}
+.prose th,.prose td{border:1px solid var(--border);padding:7px 11px;vertical-align:top}
+.prose tr:last-child td{border-bottom:1px solid var(--border)}
+.prose h1{font-size:22px;margin:.2em 0 .6em}
+.prose h2{font-size:16px;margin:1.6em 0 .6em;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.prose h3{font-size:14px;margin:1.2em 0 .4em}
+.prose ul,.prose ol{padding-left:1.3em}
+.prose li{margin:.2em 0}
+.prose hr{border:0;border-top:1px solid var(--border);margin:1.4em 0}
+.prose img{max-width:100%}
+.source{font-family:var(--mono);font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;margin:0}
+@media (max-width:1000px){.files-layout{grid-template-columns:1fr}}
+.access-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.access-grid label{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;font-size:13px;cursor:pointer}
+.access-grid input{width:auto;margin:0}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.switch input{width:auto;margin:0}
+.danger-zone{border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:0;border-bottom:1px solid var(--border);padding:12px 16px}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .nav button{white-space:nowrap;width:auto}
+  .main{padding:18px 16px 50px}
+  .kv{grid-template-columns:1fr}
+  .timeline li{grid-template-columns:1fr}
+  .topbar{padding:10px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body x-data="brainAdmin()" x-init="init()" x-cloak>
+
+<div class="toasts" aria-live="polite">
+  <template x-for="t in toasts" :key="t.id">
+    <div class="toast" :class="t.kind" x-text="t.message"></div>
+  </template>
+</div>
+
+<main x-show="!authed" class="auth">
+  <form class="card card-pad stack" @submit.prevent="login()">
+    <div class="brand"><span x-html="logoSvg(34)"></span><div><strong>AI Computer Brain</strong><div class="small muted">Admin panel</div></div></div>
+    <p class="muted">Sign in with the master key from <span class="mono">.env</span>, or run <span class="mono">brain</span> and type <span class="mono">/master</span>.</p>
+    <label class="field"><span>Master key</span><input type="password" x-model="token" required autocomplete="current-password" class="mono"></label>
+    <details class="small"><summary class="muted" style="cursor:pointer">Server URL (only when this page is hosted elsewhere)</summary>
+      <input type="url" x-model="apiBase" placeholder="https://brain.yourdomain.com" style="margin-top:8px"></details>
+    <p class="small" style="color:var(--danger)" x-show="error" x-text="error"></p>
+    <button type="submit" class="btn btn-primary" :disabled="busy" style="justify-content:center">Sign in</button>
+  </form>
+</main>
+
+<div x-show="authed" class="app">
+  <header class="topbar">
+    <div class="brand"><span x-html="logoSvg(28)"></span><div><strong>AI Computer Brain</strong> <span class="small muted" x-show="status" x-text="status && ('v' + status.version)"></span></div></div>
+    <div class="row">
+      <span class="chip" :class="status && status.llm && status.llm.enabled ? 'chip-ok' : ''" x-text="status && status.llm && status.llm.enabled ? ('LLM: ' + status.llm.provider_label) : 'LLM: off'"></span>
+      <span class="chip" x-show="status" x-text="status && (status.database + (status.redis ? ' + redis' : ''))"></span>
+      <button class="btn btn-ghost btn-sm" @click="toggleTheme()" x-text="themeMode === 'light' ? 'Dark mode' : 'Light mode'"></button>
+      <a class="btn btn-ghost btn-sm" :href="apiBase + '/api/docs'" target="_blank" rel="noopener">API docs</a>
+      <button class="btn btn-sm" @click="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div>
+        <div class="side-title"><span>Projects</span><button class="btn btn-sm btn-primary" @click="openNewProject()">New</button></div>
+        <div class="stack" style="gap:2px;margin-top:8px">
+          <template x-for="p in projects" :key="p.project_id">
+            <button class="project-item" :class="current && current.project_id === p.project_id ? 'on' : ''" @click="selectProject(p)">
+              <span class="name" x-text="p.project_name"></span>
+              <span class="meta"><span class="mono" x-text="p.project_id"></span> &middot; <span x-text="p.key_count"></span> agents<span x-show="p.live_agents"> &middot; <span style="color:var(--ok)" x-text="p.live_agents + ' live'"></span></span></span>
+            </button>
+          </template>
+          <p class="small muted" style="padding:6px 10px" x-show="!projects.length">No projects yet. Create the first one.</p>
+        </div>
+      </div>
+      <nav class="nav" x-show="current">
+        <template x-for="pg in pages" :key="pg.id">
+          <button :class="page === pg.id ? 'on' : ''" @click="setPage(pg.id)">
+            <span x-text="pg.label"></span>
+            <span class="badge" x-show="pg.id === 'approvals' && current && current.pending_proposals" x-text="current && current.pending_proposals"></span>
+          </button>
+        </template>
+      </nav>
+    </aside>
+
+    <section class="main">
+      <div x-show="!current" class="card card-pad stack" style="max-width:560px">
+        <h1>Create your first project</h1>
+        <p class="muted">One project per company or client. The brain creates the project ID, the first API key and the MCP connection for your agent from the name alone.</p>
+        <form class="stack" @submit.prevent="createProject()">
+          <label class="field"><span>Company or project name</span><input x-model="newProject.name" placeholder="Acme Corp" required autofocus></label>
+          <div class="row"><button class="btn btn-primary" :disabled="busy">Create project</button><button type="button" class="btn btn-ghost" @click="openNewProject()">More options: repository, GitHub backup</button></div>
+        </form>
+      </div>
+
+      <template x-if="current">
+        <div>
+          <div class="page-head">
+            <div>
+              <h1 x-text="current.project_name"></h1>
+              <div class="row small muted" style="margin-top:4px">
+                <span class="mono" x-text="current.project_id"></span>
+                <span>&middot;</span>
+                <span x-text="current.key_count + ' agents'"></span>
+                <span>&middot;</span>
+                <span :style="current.agents_stale ? 'color:var(--warn)' : ''" x-text="current.agents_synced + ' in sync, ' + current.agents_stale + ' stale'"></span>
+                <span>&middot;</span>
+                <span x-text="current.github_connected ? 'GitHub connected' : 'GitHub not connected'"></span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="chip" :class="streamLive ? 'chip-ok' : ''"><span class="dot" :class="streamLive ? 'dot-ok' : ''"></span><span x-text="streamLive ? 'live' : 'reconnecting'"></span></span>
+              <button class="btn btn-sm" @click="openAddAgent()">Add agent</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger)" @click="openDelete()">Delete</button>
+            </div>
+          </div>
+
+          <div x-show="issued" class="card stack" style="margin-bottom:20px;border-color:color-mix(in srgb,var(--ok) 55%,var(--border))">
+            <div class="card-head"><h2 x-text="issued && (issued.reconnect ? 'Connect ' + issued.agent_id : (issued.project && issued.justCreated ? 'Project ' + issued.project.project_name + ' is ready' : (issued.replaced_key_id ? 'New key for ' + issued.agent_id : 'Agent ' + issued.agent_id + ' added')))"></h2><button class="btn btn-ghost btn-sm" @click="issued = null">Close</button></div>
+            <div class="card-pad stack" x-show="issued">
+              <dl class="kv">
+                <dt>Project ID</dt><dd class="mono" x-text="issued && issued.project.project_id"></dd>
+                <dt>Agent</dt><dd><span class="mono" x-text="issued && issued.agent_id"></span> <span class="chip" x-text="issued && ('role ' + issued.role)"></span></dd>
+                <dt>MCP endpoint</dt><dd class="row"><span class="mono" x-text="issued && issued.mcp_url"></span><button class="btn btn-ghost btn-sm" @click="copy(issued.mcp_url)">copy</button></dd>
+                <template x-if="issued && issued.plaintext"><dt>API key</dt></template>
+                <template x-if="issued && issued.plaintext"><dd><div class="key-box"><span x-text="issued.plaintext"></span><button class="btn btn-sm" @click="copy(issued.plaintext)">copy</button></div><p class="small muted" style="margin-top:6px">Keep it in the agent's configuration; it stays viewable on the Overview and the Agents page. The key carries the project ID, the role and the agent ID; the agent sends it as a Bearer token on every MCP request.</p></dd></template>
+                <template x-if="issued && !issued.plaintext"><dt>API key</dt></template>
+                <template x-if="issued && !issued.plaintext"><dd><span class="mono" x-text="issued.key && issued.key.key_prefix"></span> <span class="small muted">created before keys were kept, so it cannot be shown; the commands below carry a placeholder. Issue a new key to see it here.</span> <button class="btn btn-sm" :disabled="busy" @click="reissueKey(issued.key)">Issue a new key</button></dd></template>
+                <template x-if="issued && issued.backup"><dt>Backup</dt></template>
+                <template x-if="issued && issued.backup"><dd><a :href="issued.backup.html_url" target="_blank" rel="noopener" x-text="issued.backup.repo"></a> <span class="small muted">private repository on your GitHub; every change is pushed there</span></dd></template>
+                <template x-if="issued && issued.backup_error"><dt>Backup</dt></template>
+                <template x-if="issued && issued.backup_error"><dd style="color:var(--warn)" x-text="'not created: ' + issued.backup_error"></dd></template>
+                <template x-if="issued && issued.github"><dt>Repository</dt></template>
+                <template x-if="issued && issued.github"><dd><span x-text="issued.github.repo_url"></span> <span class="small muted">connected; add the webhook on the GitHub &amp; LLM page</span></dd></template>
+                <template x-if="issued && issued.github_error"><dt>Repository</dt></template>
+                <template x-if="issued && issued.github_error"><dd style="color:var(--warn)" x-text="'not connected: ' + issued.github_error"></dd></template>
+              </dl>
+              <div>
+                <p class="small" style="font-weight:500;margin-bottom:8px">Connect the agent: pick its type and paste.</p>
+                <div class="tabs" style="margin-bottom:8px">
+                  <template x-for="name in snippetNames" :key="name"><button class="tab" :class="snippet === name ? 'on' : ''" @click="snippet = name" x-text="snippetLabel(name)"></button></template>
+                </div>
+                <div style="position:relative"><pre class="scroll" x-text="issued && issued.snippets[snippet]"></pre><button class="btn btn-sm" style="position:absolute;top:8px;right:8px" @click="copy(issued.snippets[snippet])">copy</button></div>
+              </div>
+              <details class="small">
+                <summary class="muted" style="cursor:pointer">What the agent does once connected</summary>
+                <dl class="kv" style="margin-top:10px">
+                  <dt>Connect</dt><dd>Paste the command into the agent. The rules travel inside the MCP connection; nothing else to configure.</dd>
+                  <dt>It then</dt><dd>Calls <span class="mono">whoami</span> and receives its role, rules, file guide, watch list and the documents shared with it.</dd>
+                  <dt>Each turn</dt><dd><span class="mono">get_company_log_delta</span> tells it what other agents and humans changed since last time.</dd>
+                  <dt>Reads</dt><dd><span class="mono">read_brain_section</span> for facts; <span class="mono">list_documents</span>, <span class="mono">search_documents</span> and <span class="mono">read_document</span> for your uploaded documents, each with a summary and topics when an LLM is connected.</dd>
+                  <dt>Writes</dt><dd><span class="mono">update_brain_section</span> after it changes something real; <span class="mono">log_agent_activity</span> after work other departments must know about.</dd>
+                  <dt>Backup</dt><dd>Every change lands in the project's Git history and, when enabled, the <span class="mono">&lt;project&gt;_brain</span> repository on your GitHub.</dd>
+                </dl>
+              </details>
+            </div>
+          </div>
+
+          <div x-show="page === 'overview'" class="stack">
+            <div class="card">
+              <div class="card-head"><h2>Connect an agent</h2><button class="btn btn-sm btn-primary" @click="openAddAgent()">Add agent</button></div>
+              <div class="card-pad stack">
+                <p class="muted">Every agent needs the MCP endpoint and its own key. Pick the agent, copy the command for its type and paste it into that agent. The key identifies the agent on every call, so give each agent its own.</p>
+                <template x-if="!keys.some(k => k.active)"><p class="muted">No agent yet. <b>Add agent</b> creates the first key.</p></template>
+                <template x-if="connect">
+                  <div class="stack">
+                    <label class="field" style="max-width:360px"><span>Agent</span><select x-model="connectAgent" @change="loadConnect()"><template x-for="k in keys.filter(k => k.active)" :key="k.key_id"><option :value="k.key_id" x-text="k.agent_id + ' (' + k.department_role + ')'"></option></template></select></label>
+                    <dl class="kv">
+                      <dt>MCP endpoint</dt><dd class="row"><span class="mono" x-text="connect.mcp_url"></span><button class="btn btn-ghost btn-sm" @click="copy(connect.mcp_url)">copy</button></dd>
+                      <dt>API key</dt>
+                      <dd>
+                        <template x-if="connect.plaintext"><div class="key-box"><span x-text="showKey ? connect.plaintext : connect.key.key_prefix + '...'"></span><button class="btn btn-ghost btn-sm" @click="showKey = !showKey" x-text="showKey ? 'hide' : 'show'"></button><button class="btn btn-sm" @click="copy(connect.plaintext)">copy</button></div></template>
+                        <template x-if="!connect.plaintext"><div class="row"><span class="mono" x-text="connect.key.key_prefix"></span><span class="small muted">created before keys were kept, so it cannot be shown; a new key replaces it.</span><button class="btn btn-sm" :disabled="busy" @click="reissueKey(connect.key)">Issue a new key</button></div></template>
+                      </dd>
+                    </dl>
+                    <div class="tabs" style="margin-bottom:8px"><template x-for="name in snippetNames" :key="name"><button class="tab" :class="snippet === name ? 'on' : ''" @click="snippet = name" x-text="snippetLabel(name)"></button></template></div>
+                    <div style="position:relative"><pre class="scroll" x-text="connect.snippets[snippet]"></pre><button class="btn btn-sm" style="position:absolute;top:8px;right:8px" @click="copy(connect.snippets[snippet])">copy</button></div>
+                    <p class="small muted" x-show="!connect.plaintext">The commands above carry a placeholder where the key goes.</p>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="card card-pad stack">
+                <h2>Sync health</h2>
+                <dl class="kv">
+                  <dt>Agents</dt><dd><span x-text="current.key_count"></span> keys, <span style="color:var(--ok)" x-text="current.live_agents + ' live now'"></span></dd>
+                  <dt>In sync</dt><dd><span x-text="current.agents_synced"></span> synced, <span :style="current.agents_stale ? 'color:var(--warn)' : ''" x-text="current.agents_stale + ' stale'"></span> <span class="small muted" x-text="'(no delta call for ' + (status ? status.stale_after_minutes : 30) + ' min)'"></span></dd>
+                  <dt>Last change</dt><dd><span x-text="current.last_mutation_summary || 'nothing yet'"></span> <span class="small muted" x-text="fmtTime(current.last_mutation_at)"></span></dd>
+                  <dt>Approvals</dt><dd><span x-text="current.pending_proposals + ' waiting'"></span></dd>
+                  <dt>Changelog</dt><dd x-text="current.last_activity_at ? 'last entry ' + fmtTime(current.last_activity_at) : 'no agent entries yet'"></dd>
+                </dl>
+              </div>
+              <div class="card card-pad stack">
+                <h2>Sources</h2>
+                <dl class="kv">
+                  <dt>GitHub</dt><dd><span x-text="github && github.connected ? github.repo_url : 'not connected'"></span> <button class="btn btn-ghost btn-sm" @click="setPage('sync')">manage</button></dd>
+                  <dt>Last push</dt><dd x-text="current.github_last_event_at ? fmtTime(current.github_last_event_at) : (current.webhook_configured ? 'webhook set, nothing received yet' : 'no webhook')"></dd>
+                  <dt>Last analysis</dt><dd x-text="github && github.last_analysis && github.last_analysis.finished_at ? (fmtTime(github.last_analysis.finished_at) + (github.last_analysis.ok ? ', ' + github.last_analysis.sections_updated + ' sections updated' : ', failed')) : 'never'"></dd>
+                  <dt>LLM</dt><dd x-text="status && status.llm && status.llm.enabled ? status.llm.provider_label + ' (' + status.llm.model + ')' : 'none (optional)'"></dd>
+                  <dt>Documents</dt><dd><span x-text="documents.length + ' uploaded'"></span> <button class="btn btn-ghost btn-sm" @click="setPage('documents')">manage</button></dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>Latest activity</h2><button class="btn btn-ghost btn-sm" @click="setPage('activity')">all activity</button></div>
+              <ul class="timeline">
+                <template x-for="e in log.slice(0, 8)" :key="e.log_id">
+                  <li @click="setPage('activity'); showDiff(e)"><time x-text="fmtShort(e.created_at)"></time><div><span class="actor" x-text="e.actor"></span> <span x-text="e.summary"></span><div class="small muted mono" x-text="shortTarget(e.target)"></div></div></li>
+                </template>
+              </ul>
+              <div class="empty" x-show="!log.length">Nothing happened yet. Connect an agent and it will show up here.</div>
+            </div>
+          </div>
+
+          <div x-show="page === 'agents'" class="stack">
+            <div class="card">
+              <div class="card-head"><h2>Agents and API keys</h2><button class="btn btn-sm btn-primary" @click="openAddAgent()">Add agent</button></div>
+              <p class="muted" style="padding:0 20px 12px">One row is one agent and its key. The key is the agent's identity: it goes in the Authorization header of the agent's MCP connection, and the brain reads the project, the role and the agent from it. <b>connect</b> shows the key and the commands at any time, <b>new key</b> replaces one.</p>
+              <div class="scroll" style="overflow-x:auto">
+                <table>
+                  <thead><tr><th>Agent</th><th>Role</th><th>Key</th><th>Status</th><th>Last sync</th><th>Synced to</th><th></th></tr></thead>
+                  <tbody>
+                    <template x-for="k in keys" :key="k.key_id">
+                      <tr>
+                        <td><div class="mono" x-text="k.agent_id"></div><div class="small muted" x-text="k.label"></div></td>
+                        <td x-text="k.department_role"></td>
+                        <td class="mono small" x-text="k.key_prefix"></td>
+                        <td><span class="chip" :class="!k.active ? '' : (k.stale ? 'chip-warn' : 'chip-ok')" x-text="!k.active ? 'revoked' : (k.stale ? 'stale' : 'active')"></span></td>
+                        <td class="small" x-text="fmtTime(k.last_sync_at) || 'never'"></td>
+                        <td class="small mono" x-text="'#' + k.last_sync_log_id"></td>
+                        <td style="text-align:right;white-space:nowrap">
+                          <button x-show="k.active" class="btn btn-ghost btn-sm" @click="showConnect(k)">connect</button>
+                          <button x-show="k.active && pendingReissue !== k.key_id" class="btn btn-ghost btn-sm" @click="pendingReissue = k.key_id">new key</button>
+                          <span x-show="pendingReissue === k.key_id"><button class="btn btn-primary btn-sm" @click="reissueKey(k)">confirm new key</button> <button class="btn btn-ghost btn-sm" @click="pendingReissue = null">keep</button></span>
+                          <button x-show="k.active && pendingRevoke !== k.key_id" class="btn btn-ghost btn-sm" @click="pendingRevoke = k.key_id">revoke</button>
+                          <span x-show="pendingRevoke === k.key_id"><button class="btn btn-danger btn-sm" @click="revokeKey(k)">confirm revoke</button> <button class="btn btn-ghost btn-sm" @click="pendingRevoke = null">keep</button></span>
+                        </td>
+                      </tr>
+                    </template>
+                    <tr x-show="!keys.length"><td colspan="7" class="empty">No agents yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>Connected right now</h2><span class="small muted">seen in the last 3 minutes</span></div>
+              <div class="scroll" style="overflow-x:auto">
+                <table>
+                  <thead><tr><th>Agent</th><th>Role</th><th>Transport</th><th>Client</th><th>Connected</th><th>Last seen</th></tr></thead>
+                  <tbody>
+                    <template x-for="s in sessions" :key="s.session_id">
+                      <tr><td class="mono" x-text="s.agent_id"></td><td x-text="s.department_role"></td><td class="small" x-text="s.transport"></td><td class="small" x-text="s.client_info || ''"></td><td class="small" x-text="fmtTime(s.connected_at)"></td><td class="small" x-text="fmtTime(s.last_seen_at)"></td></tr>
+                    </template>
+                    <tr x-show="!sessions.length"><td colspan="6" class="empty">No live sessions. Agents appear here while they talk to the brain.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div x-show="page === 'files'" class="files-layout">
+            <aside class="card" style="padding:8px">
+              <template x-for="f in files" :key="f.file">
+                <button class="file-item" :class="activeFile === f.file ? 'on' : ''" @click="openFile(f.file)">
+                  <span class="name" x-text="f.file"></span>
+                  <span class="meta"><span x-text="f.sections.length"></span> sections &middot; <span class="mono" x-text="f.etag"></span></span>
+                </button>
+              </template>
+            </aside>
+            <section class="card" x-show="fileDoc" style="min-width:0">
+              <div class="card-head" style="flex-wrap:wrap">
+                <div>
+                  <h2 class="mono" style="font-size:15px" x-text="activeFile"></h2>
+                  <div class="small muted"><span x-text="fileDoc ? fileDoc.sections.length + ' sections' : ''"></span> &middot; etag <span class="mono" x-text="fileDoc && fileDoc.etag"></span> &middot; agents re-read a section only when its etag changes</div>
+                </div>
+                <div class="row">
+                  <div class="tabs" x-show="fileMode === 'view'"><button class="tab" :class="!showSource ? 'on' : ''" @click="showSource = false">Rendered</button><button class="tab" :class="showSource ? 'on' : ''" @click="showSource = true">Source</button></div>
+                  <label class="btn btn-sm" style="cursor:pointer">Upload .md<input type="file" accept=".md,.markdown,.txt" style="display:none" @change="uploadBrainFile($event)"></label>
+                  <button class="btn btn-sm" @click="downloadFile()">Download</button>
+                  <button x-show="fileMode === 'view'" class="btn btn-sm btn-primary" @click="startEditFile()">Edit file</button>
+                  <button x-show="fileMode !== 'view'" class="btn btn-sm" @click="cancelEdit()">Cancel</button>
+                </div>
+              </div>
+              <div x-show="uploadPlan" class="card-pad stack" style="border-bottom:1px solid var(--border)">
+                <h3 x-text="'Upload ' + (uploadPlan ? uploadPlan.name : '') + ' into ' + activeFile"></h3>
+                <div class="row">
+                  <label class="switch"><input type="radio" value="replace" x-model="uploadMode"> Replace the file</label>
+                  <label class="switch" :style="llmEnabled() ? '' : 'opacity:.5'"><input type="radio" value="smart" x-model="uploadMode" :disabled="!llmEnabled()"> Merge into the right sections with the LLM</label>
+                </div>
+                <p class="small muted" x-show="!llmEnabled()">Merging needs a connected LLM (GitHub &amp; LLM page). Replace works without one; the file needs at least one ## heading.</p>
+                <div class="row"><button class="btn btn-primary btn-sm" :disabled="busy" @click="confirmUpload()">Upload</button><button class="btn btn-ghost btn-sm" @click="uploadPlan = null">Cancel</button></div>
+              </div>
+              <div class="toc" x-show="fileMode === 'view' && fileDoc && fileDoc.sections.length">
+                <template x-for="sec in (fileDoc ? fileDoc.sections : [])" :key="sec.slug">
+                  <button :class="sec.level === 3 ? 'sub' : ''" @click="editSection(sec)" :title="'Edit ' + sec.heading"><span x-text="(sec.level === 3 ? '\u203a ' : '') + sec.heading"></span><span class="etag" x-text="sec.etag"></span></button>
+                </template>
+                <span class="small muted" style="align-self:center">click a section to edit it</span>
+              </div>
+              <article x-show="fileMode === 'view' && !showSource" class="card-pad prose scroll" style="max-width:none;overflow-x:auto" x-html="rendered(fileDoc && fileDoc.content)"></article>
+              <pre x-show="fileMode === 'view' && showSource" class="card-pad source scroll" style="border:0;border-radius:0 0 var(--radius) var(--radius);background:transparent;color:var(--ink)" x-text="fileDoc && fileDoc.content"></pre>
+              <form x-show="fileMode !== 'view'" class="card-pad stack" @submit.prevent="saveEdit()">
+                <div class="row between">
+                  <h3 x-text="fileMode === 'section' ? 'Editing section: ' + editor.heading : 'Editing ' + activeFile"></h3>
+                  <span class="small muted mono" x-text="'etag ' + editor.etag"></span>
+                </div>
+                <textarea x-model="editor.content" rows="22"></textarea>
+                <div class="row" style="align-items:flex-end">
+                  <label class="field" style="flex:1"><span>Summary for the agents (max 160 chars)</span><input x-model="editor.summary" required maxlength="160" placeholder="What changed and why"></label>
+                  <button type="submit" class="btn btn-primary" :disabled="busy">Save and broadcast</button>
+                </div>
+                <div x-show="conflict" class="card card-pad stack" style="border-color:var(--warn)">
+                  <p style="font-weight:500">Someone changed this while you were editing. Current version:</p>
+                  <pre class="scroll" style="max-height:260px" x-text="conflict && conflict.current_content"></pre>
+                  <button type="button" class="btn btn-sm" @click="takeCurrent()" style="align-self:flex-start">Load the current version into the editor</button>
+                </div>
+              </form>
+            </section>
+          </div>
+
+          <div x-show="page === 'documents'" class="stack">
+            <div class="card card-pad stack">
+              <div><h2>Knowledge base</h2><p class="muted" style="margin-top:4px">Upload the documents your agents must know: SOPs, specs, contracts, research. Agents read them over MCP with <span class="mono">list_documents</span>, <span class="mono">search_documents</span> and <span class="mono">read_document</span>; you decide which agents see each file.</p></div>
+              <div class="drop" :class="dragOver ? 'over' : ''" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="dragOver = false; pickDocument($event.dataTransfer.files)">
+                <p x-show="!docForm.file">Drop a file here or <label style="color:var(--accent);cursor:pointer">choose one<input type="file" accept=".md,.markdown,.txt,.csv,.tsv,.json,.yaml,.yml,.xml,.rst,.log,.pdf,.docx,.html,.htm" style="display:none" @change="pickDocument($event.target.files)"></label></p>
+                <p x-show="docForm.file" x-text="docForm.file ? docForm.file.name + ' (' + fmtSize(docForm.file.size) + ')' : ''" style="color:var(--ink)"></p>
+                <p class="small" style="margin-top:4px">Markdown, text, CSV, JSON, YAML, HTML, PDF or Word (.docx), up to 20 MB.</p>
+              </div>
+              <div class="grid-2" x-show="docForm.file">
+                <label class="field"><span>Title</span><input x-model="docForm.title" placeholder="Taken from the file name when empty"></label>
+                <div>
+                  <span class="small" style="display:block;font-weight:500;color:var(--ink-2);margin-bottom:5px">Who may read it</span>
+                  <div class="row"><label class="switch"><input type="radio" value="all" x-model="docForm.mode"> Every agent of the project</label><label class="switch"><input type="radio" value="custom" x-model="docForm.mode"> Only selected agents or roles</label></div>
+                </div>
+              </div>
+              <div x-show="docForm.file && docForm.mode === 'custom'" class="stack" style="gap:8px">
+                <div class="access-grid">
+                  <template x-for="k in keys.filter(k => k.active)" :key="k.key_id"><label><input type="checkbox" :value="k.agent_id" x-model="docForm.agents"><span class="mono" x-text="k.agent_id"></span></label></template>
+                  <template x-for="r in roles" :key="r"><label><input type="checkbox" :value="'role:' + r" x-model="docForm.agents"><span x-text="'every ' + r + ' agent'"></span></label></template>
+                </div>
+                <p class="small muted">Agents added later with one of the ticked roles see it too.</p>
+              </div>
+              <div class="row" x-show="docForm.file"><button class="btn btn-primary" :disabled="busy" @click="uploadDocument()">Upload document</button><button class="btn btn-ghost" @click="resetDocForm()">Cancel</button></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>Documents</h2><span class="small muted" x-text="documents.length + ' files'"></span></div>
+              <div class="scroll" style="overflow-x:auto">
+                <table>
+                  <thead><tr><th>Title</th><th>File</th><th>Size</th><th>Shared with</th><th>Uploaded</th><th></th></tr></thead>
+                  <tbody>
+                    <template x-for="d in documents" :key="d.doc_id">
+                      <tr>
+                        <td><div style="font-weight:500" x-text="d.title"></div><div class="small muted" x-show="d.summary" x-text="d.summary"></div><div class="row" style="gap:4px;margin-top:4px"><template x-for="tp in d.topics" :key="tp"><span class="chip" x-text="tp"></span></template></div><div class="small muted mono" x-show="!d.summary" x-text="d.doc_id"></div></td>
+                        <td class="small mono" x-text="d.original_name"></td>
+                        <td class="small" x-text="fmtSize(d.size_bytes) + ', ' + Math.round(d.text_chars / 1000) + 'k chars'"></td>
+                        <td>
+                          <span class="chip chip-ok" x-show="d.shared_with_all">all agents</span>
+                          <template x-for="a in (d.shared_with_all ? [] : d.access)" :key="a"><span class="chip chip-accent mono" x-text="a"></span></template>
+                        </td>
+                        <td class="small" x-text="fmtTime(d.created_at)"></td>
+                        <td style="text-align:right;white-space:nowrap">
+                          <button class="btn btn-ghost btn-sm" @click="previewDocument(d)">preview</button>
+                          <button class="btn btn-ghost btn-sm" @click="editAccess(d)">share</button>
+                          <a class="btn btn-ghost btn-sm" :href="apiBase + '/api/admin/projects/' + current.project_id + '/documents/' + d.doc_id + '/download?key=' + encodeURIComponent(token)">download</a>
+                          <button x-show="pendingDelete !== d.doc_id" class="btn btn-ghost btn-sm" @click="pendingDelete = d.doc_id">delete</button>
+                          <span x-show="pendingDelete === d.doc_id"><button class="btn btn-danger btn-sm" @click="deleteDocument(d)">confirm</button> <button class="btn btn-ghost btn-sm" @click="pendingDelete = null">keep</button></span>
+                        </td>
+                      </tr>
+                    </template>
+                    <tr x-show="!documents.length"><td colspan="6" class="empty">No documents yet. Everything you upload becomes part of the agents' knowledge base.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div x-show="docPreview" class="card">
+              <div class="card-head"><h2 x-text="docPreview && docPreview.title"></h2><button class="btn btn-ghost btn-sm" @click="docPreview = null">close</button></div>
+              <pre class="scroll" style="border:0;border-radius:0 0 var(--radius) var(--radius);max-height:420px" x-text="docPreview && docPreview.preview"></pre>
+            </div>
+            <div x-show="accessEdit" class="backdrop" @click.self="accessEdit = null">
+              <div class="modal">
+                <div class="card-head"><h2 x-text="accessEdit && ('Share ' + accessEdit.title)"></h2><button class="btn btn-ghost btn-sm" @click="accessEdit = null">close</button></div>
+                <div class="card-pad stack">
+                  <div class="row"><label class="switch"><input type="radio" value="all" x-model="accessForm.mode"> Every agent of the project</label><label class="switch"><input type="radio" value="custom" x-model="accessForm.mode"> Only selected</label></div>
+                  <div x-show="accessForm.mode === 'custom'" class="access-grid">
+                    <template x-for="k in keys.filter(k => k.active)" :key="k.key_id"><label><input type="checkbox" :value="k.agent_id" x-model="accessForm.agents"><span class="mono" x-text="k.agent_id"></span></label></template>
+                    <template x-for="r in roles" :key="r"><label><input type="checkbox" :value="'role:' + r" x-model="accessForm.agents"><span x-text="'every ' + r + ' agent'"></span></label></template>
+                  </div>
+                  <label class="field"><span>Title</span><input x-model="accessForm.title"></label>
+                  <div class="row"><button class="btn btn-primary" :disabled="busy" @click="saveAccess()">Save</button><button class="btn btn-ghost" @click="accessEdit = null">Cancel</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div x-show="page === 'assistant'" class="stack">
+            <div class="card card-pad" x-show="!llmEnabled()">
+              <h2>Assistant</h2>
+              <p class="muted" style="margin-top:6px">Ask questions over the brain files, the findings and the uploaded documents, or tell the assistant what to change in a brain file and apply its edits. Connect an LLM on the <a href="#" @click.prevent="setPage('sync')">GitHub &amp; LLM</a> page first.</p>
+            </div>
+            <div class="card" x-show="llmEnabled()" style="display:flex;flex-direction:column;min-height:60vh">
+              <div class="card-head"><div><h2>Assistant</h2><p class="small muted">Answers come from the brain files, recent activity and the documents shared in this project. Edits are proposed first and applied only when you approve them.</p></div><button class="btn btn-ghost btn-sm" @click="chat.messages = []; chat.pending = []">clear</button></div>
+              <div class="scroll" style="flex:1;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+                <div class="muted" x-show="!chat.messages.length">Try: "What is our current pricing?", "Which services run in production?", "Add a Team plan at $99 per month to the pricing tiers", "Change the primary colour to #2563EB".</div>
+                <template x-for="(m, i) in chat.messages" :key="i">
+                  <div :style="m.role === 'user' ? 'align-self:flex-end;max-width:70ch' : 'align-self:flex-start;max-width:72ch'">
+                    <div class="small muted" style="margin-bottom:3px" x-text="m.role === 'user' ? 'You' : 'Assistant'"></div>
+                    <div class="prose" :class="m.role === 'user' ? 'card card-pad' : ''" :style="m.role === 'user' ? 'background:var(--surface-2);padding:10px 14px' : ''" x-html="m.role === 'user' ? escapeHtml(m.content) : rendered(m.content)"></div>
+                  </div>
+                </template>
+                <div class="small muted" x-show="chat.busy">thinking...</div>
+                <div x-show="chat.pending.length" class="card card-pad stack" style="border-color:color-mix(in srgb,var(--accent) 55%,var(--border))">
+                  <div class="row between"><h3 x-text="chat.pending.length + ' proposed change' + (chat.pending.length > 1 ? 's' : '')"></h3><div class="row"><button class="btn btn-primary btn-sm" :disabled="busy" @click="applyChanges(chat.pending)">Apply all</button><button class="btn btn-ghost btn-sm" @click="chat.pending = []">Dismiss</button></div></div>
+                  <template x-for="(c, i) in chat.pending" :key="i">
+                    <details class="card" style="padding:10px 14px">
+                      <summary style="cursor:pointer" class="row between"><span><span class="mono" x-text="c.file"></span> &rsaquo; <span x-text="c.heading"></span> <span class="chip" x-text="c.mode"></span></span><span class="small muted" x-text="c.summary"></span></summary>
+                      <pre class="scroll" style="margin-top:10px;max-height:300px" x-text="c.content"></pre>
+                      <div class="row" style="margin-top:8px"><button class="btn btn-sm" :disabled="busy" @click="applyChanges([c])">Apply this one</button></div>
+                    </details>
+                  </template>
+                </div>
+              </div>
+              <form class="row" style="padding:12px 20px;border-top:1px solid var(--border)" @submit.prevent="sendChat()">
+                <textarea x-model="chat.input" rows="2" style="flex:1;min-height:44px;font-family:var(--font);font-size:14px" placeholder="Ask about the brain, or describe the change you want" @keydown.enter.exact.prevent="sendChat()"></textarea>
+                <button type="submit" class="btn btn-primary" :disabled="chat.busy || !chat.input.trim()">Send</button>
+              </form>
+            </div>
+          </div>
+
+          <div x-show="page === 'activity'" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:16px" class="files-grid">
+            <div class="card">
+              <div class="card-head"><h2>Activity</h2><button class="btn btn-ghost btn-sm" @click="loadLog()">refresh</button></div>
+              <ul class="timeline">
+                <template x-for="e in log" :key="e.log_id">
+                  <li @click="showDiff(e)"><time x-text="fmtShort(e.created_at)"></time><div><span class="actor" x-text="e.actor"></span> <span x-text="e.summary"></span><div class="small muted"><span class="mono" x-text="shortTarget(e.target)"></span><span x-show="e.commit_sha"> &middot; commit <span class="mono" x-text="e.commit_sha ? e.commit_sha.slice(0, 7) : ''"></span></span></div></div></li>
+                </template>
+              </ul>
+              <div class="empty" x-show="!log.length">No activity yet.</div>
+            </div>
+            <div class="card card-pad stack">
+              <h3>Change detail</h3>
+              <p class="small muted" x-show="!diff">Click an entry to see its commit diff.</p>
+              <div x-show="diff" class="stack">
+                <p class="small mono" style="word-break:break-all" x-text="diff && diff.entry"></p>
+                <pre class="scroll" style="max-height:520px" x-text="diff && (diff.diff || 'No commit yet for this entry; the Git worker commits a few seconds after the write.')"></pre>
+              </div>
+            </div>
+          </div>
+
+          <div x-show="page === 'approvals'" class="stack">
+            <p class="muted">Writes from roles with <span class="mono">rw-approve</span> wait here. Approving applies, logs, commits and broadcasts the change.</p>
+            <template x-for="p in proposals" :key="p.proposal_id">
+              <div class="card card-pad stack">
+                <div class="row between"><div><span class="actor" x-text="p.department + '/' + p.agent_id"></span> wants to <span x-text="p.mode"></span> <span class="mono" x-text="shortTarget(p.target_uri)"></span></div><span class="small muted" x-text="fmtTime(p.created_at)"></span></div>
+                <p style="font-weight:500" x-text="p.compact_summary"></p>
+                <pre class="scroll" style="max-height:260px" x-text="p.patch_content"></pre>
+                <div class="row"><input x-model="decisionNotes[p.proposal_id]" placeholder="Note for the agent (optional)" style="flex:1"><button class="btn btn-primary btn-sm" :disabled="busy" @click="decide(p, true)">Approve</button><button class="btn btn-danger btn-sm" :disabled="busy" @click="decide(p, false)">Reject</button></div>
+              </div>
+            </template>
+            <div class="card empty" x-show="!proposals.length">Nothing waiting for approval.</div>
+          </div>
+
+          <div x-show="page === 'rules'" class="stack">
+            <p class="muted">These sections of <span class="mono">ACCESS_PERMISSIONS.md</span> travel to every agent through the MCP connection. Edit them to change what agents update and when; they apply on the next <span class="mono">whoami</span>.</p>
+            <template x-for="r in ruleSections" :key="r.slug">
+              <form class="card card-pad stack" @submit.prevent="saveRule(r)">
+                <div class="row between"><h3 x-text="r.heading"></h3><span class="small muted mono" x-text="rules[r.slug] ? 'etag ' + rules[r.slug].etag : ''"></span></div>
+                <p class="small muted" x-text="r.help"></p>
+                <textarea x-model="ruleDrafts[r.slug]" rows="10"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm" :disabled="busy" style="align-self:flex-end">Save</button>
+              </form>
+            </template>
+          </div>
+
+          <div x-show="page === 'sync'" class="stack">
+            <div class="card">
+              <div class="card-head"><h2>GitHub account</h2><span class="chip" :class="githubAccount.connected ? 'chip-ok' : ''" x-text="githubAccount.connected ? githubAccount.owner : 'not connected'"></span></div>
+              <div class="card-pad stack">
+                <p class="muted">Used to create the <span class="mono">&lt;project&gt;_brain</span> backup repositories on your GitHub and push every change there. Create a personal access token with the <span class="mono">repo</span> scope (classic) or Administration and Contents write access (fine-grained).</p>
+                <form class="row" @submit.prevent="connectGithubAccount()">
+                  <input type="password" x-model="githubTokenInput" :placeholder="githubAccount.connected ? 'saved ' + (githubAccount.token_hint || '') + '; paste a new token to replace it' : 'ghp_... or github_pat_...'" class="mono" style="max-width:420px">
+                  <button type="submit" class="btn btn-primary btn-sm" :disabled="busy || !githubTokenInput.trim()" x-text="githubAccount.connected ? 'Replace token' : 'Connect account'"></button>
+                  <button type="button" class="btn btn-ghost btn-sm" x-show="githubAccount.connected" @click="disconnectGithubAccount()">Disconnect</button>
+                </form>
+                <p class="small muted" x-show="current && current.backup_repo">This project backs up to <a :href="current.backup_url" target="_blank" rel="noopener" x-text="current.backup_repo"></a>.</p>
+                <div class="row" x-show="current && !current.backup_repo && githubAccount.connected"><button class="btn btn-sm" :disabled="busy" @click="createBackup()" x-text="'Create backup repository ' + current.project_id + '_brain'"></button></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2>GitHub repository</h2><span class="chip" :class="github && github.connected ? 'chip-ok' : ''" x-text="github && github.connected ? 'connected' : 'not connected'"></span></div>
+              <div class="card-pad stack">
+                <p class="muted">Connect the company repository. Every push lands in the company log, and with an LLM the brain reads the code and fills the design system, stack, schema and product facts itself, so the brain stays current even when no agent is working.</p>
+                <form class="stack" @submit.prevent="saveGithub()">
+                  <div class="grid-2">
+                    <label class="field"><span>Repository URL</span><input x-model="githubForm.repo_url" placeholder="https://github.com/org/repo" class="mono" required></label>
+                    <label class="field"><span>Branch</span><input x-model="githubForm.branch" placeholder="default branch" class="mono"></label>
+                    <label class="field"><span>Access token (private repositories)</span><input type="password" x-model="githubForm.token" :placeholder="github && github.token_set ? 'saved; type to replace' : 'ghp_... or a fine-grained token with contents:read'" class="mono"><span class="hint">Stored on this server only and used to clone. Public repositories need none.</span></label>
+                    <label class="switch" style="align-self:end;padding-bottom:10px"><input type="checkbox" x-model="githubForm.analyze_on_push"> Analyse the repository after every push</label>
+                  </div>
+                  <div class="row"><button type="submit" class="btn btn-primary" :disabled="busy" x-text="github && github.connected ? 'Save' : 'Connect repository'"></button><button type="button" class="btn btn-danger" x-show="github && github.connected" @click="disconnectGithub()">Disconnect</button></div>
+                </form>
+                <div x-show="github && github.connected" class="card card-pad stack" style="background:var(--surface-2)">
+                  <h3>Webhook: let GitHub tell the brain about pushes</h3>
+                  <dl class="kv">
+                    <dt>Payload URL</dt><dd class="row"><span class="mono" x-text="github && github.webhook_url"></span><button class="btn btn-ghost btn-sm" @click="copy(github.webhook_url)">copy</button></dd>
+                    <dt>Secret</dt><dd><span x-show="webhookSecret" class="row"><span class="mono" x-text="webhookSecret"></span><button class="btn btn-ghost btn-sm" @click="copy(webhookSecret)">copy</button></span><span x-show="!webhookSecret" class="row"><span class="muted" x-text="github && github.webhook_configured ? 'set; rotate to see a new one' : 'none'"></span><button class="btn btn-ghost btn-sm" @click="rotateWebhook()">rotate</button></span></dd>
+                    <dt>In GitHub</dt><dd>Settings &rarr; Webhooks &rarr; Add webhook, content type <span class="mono">application/json</span>, event Pushes.</dd>
+                  </dl>
+                </div>
+                <div x-show="github && github.connected" class="stack">
+                  <div class="row between">
+                    <h3>Analysis</h3>
+                    <button class="btn btn-primary btn-sm" :disabled="busy || !llmEnabled() || (analysis && analysis.state === 'running')" @click="runAnalysis()" x-text="analysis && analysis.state === 'running' ? 'Running...' : 'Analyse now'"></button>
+                  </div>
+                  <p class="small muted" x-show="!llmEnabled()">Connect an LLM below to analyse the repository.</p>
+                  <ul class="progress" x-show="analysis && analysis.steps && analysis.steps.length">
+                    <template x-for="(s, i) in (analysis ? analysis.steps : [])" :key="i"><li><span x-text="fmtShort(s.at)"></span><span x-text="s.text"></span></li></template>
+                  </ul>
+                  <p class="small" style="color:var(--danger)" x-show="analysis && analysis.state === 'failed'" x-text="analysis && analysis.error"></p>
+                  <div x-show="analysis && analysis.state === 'done' && analysis.result" class="card card-pad" style="border-color:color-mix(in srgb,var(--ok) 55%,var(--border))">
+                    <dl class="kv">
+                      <dt>Sections updated</dt><dd x-text="analysis && analysis.result ? (analysis.result.sections.join(', ') || 'none changed') : ''"></dd>
+                      <dt>Findings logged</dt><dd x-text="analysis && analysis.result ? analysis.result.findings : ''"></dd>
+                      <dt>Tables synced</dt><dd x-text="analysis && analysis.result ? analysis.result.tables : ''"></dd>
+                      <dt>Summary</dt><dd x-text="analysis && analysis.result ? analysis.result.summary : ''"></dd>
+                    </dl>
+                  </div>
+                  <p class="small muted" x-show="github && github.last_analysis && github.last_analysis.finished_at && !(analysis && analysis.state !== 'idle')" x-text="github && github.last_analysis ? ('Last analysis ' + fmtTime(github.last_analysis.finished_at) + (github.last_analysis.ok ? ': ' + github.last_analysis.sections_updated + ' sections, ' + github.last_analysis.findings + ' findings' : ': failed, ' + github.last_analysis.error)) : ''"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2>LLM provider <span class="small muted" style="font-weight:400">optional</span></h2><span class="chip" :class="llmEnabled() ? 'chip-ok' : ''" x-text="llmEnabled() ? (llmInfo.provider_label + ' / ' + llmInfo.model) : 'not connected'"></span></div>
+              <div class="card-pad stack">
+                <p class="muted">Used only by this server: to analyse the repository and to merge uploaded documents into the right sections. Your agents bring their own models and never need it. The key is stored in <span class="mono">.env</span> on this server.</p>
+                <form class="stack" @submit.prevent="saveLlm()">
+                  <div class="tabs">
+                    <template x-for="p in (llmInfo ? llmInfo.providers : [])" :key="p.key"><button type="button" class="tab" :class="llmForm.provider === p.key ? 'on' : ''" @click="pickProvider(p)" x-text="p.label"></button></template>
+                    <button type="button" class="tab" :class="llmForm.provider === '' ? 'on' : ''" @click="llmForm.provider = ''">None</button>
+                  </div>
+                  <p class="small muted" x-show="llmForm.provider && providerSpec().note" x-text="providerSpec().note"></p>
+                  <div class="row" x-show="providerSpec().oauth">
+                    <label class="switch"><input type="radio" value="oauth" x-model="llmForm.auth"> <span x-text="'Sign in with your ' + (oauthSpec().account_label || 'account')"></span></label>
+                    <label class="switch" x-show="llmForm.provider === 'anthropic'"><input type="radio" value="login" x-model="llmForm.auth"> Anthropic CLI profile</label>
+                    <label class="switch"><input type="radio" value="api_key" x-model="llmForm.auth"> API key</label>
+                  </div>
+                  <div class="steps" x-show="providerSpec().oauth && llmForm.auth === 'oauth'" style="margin-top:4px">
+                    <b>1</b><div class="stack" style="gap:10px">
+                      <p class="small muted" x-text="oauthSpec().products ? 'No API key: ' + oauthSpec().products + '. The tokens stay on this server and refresh themselves.' : ''"></p>
+                      <p class="small" x-show="oauthSpec().signed_in"><span class="chip chip-ok" x-text="'signed in' + (oauthSpec().account ? ' as ' + oauthSpec().account : '')"></span> <button type="button" class="btn btn-ghost btn-sm" @click="signOutOAuth()">sign out</button></p>
+                      <div class="card card-pad stack" style="border-color:var(--warn)" x-show="llmForm.provider === 'gemini' && oauthSpec().signed_in && oauthSpec().needs_project">
+                        <p style="font-weight:500">Gemini needs one more thing</p>
+                        <p class="small muted" x-text="oauthSpec().note || 'Google reserves the free Gemini sign-in for its own apps.'"></p>
+                        <p class="small">Enter a Google Cloud project ID that has a Gemini Code Assist licence, or switch to API key above (a free key takes a minute at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>).</p>
+                        <div class="row"><input x-model="geminiProject" placeholder="my-gcp-project-id" class="mono" style="max-width:320px"><button type="button" class="btn btn-primary btn-sm" :disabled="busy || !geminiProject.trim()" @click="setGeminiProject()">Use this project</button></div>
+                      </div>
+                      <div class="row">
+                        <button type="button" class="btn" :disabled="busy || oauthWaiting" @click="startOAuth()" x-text="oauthFlow && oauthFlow.url ? 'Restart sign-in' : (oauthSpec().signed_in ? 'Sign in again' : 'Sign in')"></button>
+                        <button type="button" class="btn btn-ghost btn-sm" x-show="oauthSpec().signed_in && !models.length" :disabled="busy" @click="useExistingSignIn()">Use the current sign-in</button>
+                        <span class="small muted" x-show="oauthWaiting">waiting for the browser to come back...</span>
+                      </div>
+                      <div x-show="oauthFlow && oauthFlow.url" class="card card-pad stack" style="background:var(--surface-2)">
+                        <p>A sign-in tab was opened. If it did not open, use this link:</p>
+                        <p class="mono" style="word-break:break-all"><a :href="oauthFlow && oauthFlow.url" target="_blank" rel="noopener" x-text="oauthFlow && oauthFlow.url"></a></p>
+                        <p class="small muted" x-text="oauthFlow && oauthFlow.paste_hint"></p>
+                        <div class="row"><input x-model="oauthCode" placeholder="paste the code or the address here" class="mono" style="max-width:420px"><button type="button" class="btn btn-primary" :disabled="busy || !oauthCode.trim()" @click="completeOAuth(oauthCode)">Complete sign-in</button></div>
+                      </div>
+                    </div>
+                    <b>2</b><div class="stack" style="gap:10px" :style="models.length ? '' : 'opacity:.55'">
+                      <label class="field"><span>Model</span>
+                        <select x-model="llmForm.model" x-show="models.length" class="mono">
+                          <template x-for="m in models" :key="'o' + m.id"><option :value="m.id" x-text="m.name ? (m.id + '  (' + m.name + ')') : m.id"></option></template>
+                        </select>
+                        <input x-show="!models.length" x-model="llmForm.model" :placeholder="providerSpec().default_model || 'model id'" class="mono">
+                        <span class="hint" x-text="models.length ? models.length + ' models available to this account' : 'The models load after the sign-in completes.'"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="steps" x-show="llmForm.provider === 'anthropic' && llmForm.auth === 'login'" style="margin-top:4px">
+                    <b>1</b><div class="stack" style="gap:10px">
+                      <p class="small muted" x-show="login && !login.available">The Anthropic CLI (<span class="mono">ant</span>) is needed on the server for sign-in. Install it, then reload this page:<br><template x-for="line in (login ? login.install : [])" :key="line"><span class="mono" x-text="line" style="display:block;margin-top:4px"></span></template></p>
+                      <p class="small muted" x-show="login && login.available && login.profile" x-text="'Current sign-in on the server: ' + login.profile.split('\n')[0]"></p>
+                      <div class="row"><button type="button" class="btn" :disabled="busy || !(login && login.available)" @click="startLogin()" x-text="loginFlow && loginFlow.url ? 'Restart sign-in' : 'Start sign-in'"></button><span class="small muted" x-show="llmInfo && llmInfo.auth === 'login' && llmInfo.enabled">Signed in and active.</span></div>
+                      <div x-show="loginFlow && loginFlow.url" class="card card-pad stack" style="background:var(--surface-2)">
+                        <p>Open this link, sign in, then paste the code it shows:</p>
+                        <p class="mono" style="word-break:break-all"><a :href="loginFlow && loginFlow.url" target="_blank" rel="noopener" x-text="loginFlow && loginFlow.url"></a></p>
+                        <div class="row"><input x-model="loginCode" placeholder="paste the code here" class="mono" style="max-width:360px"><button type="button" class="btn btn-primary" :disabled="busy || !loginCode.trim()" @click="completeLogin()">Complete sign-in</button></div>
+                      </div>
+                    </div>
+                    <b>2</b><div class="stack" style="gap:10px" :style="models.length ? '' : 'opacity:.55'">
+                      <label class="field"><span>Model</span>
+                        <select x-model="llmForm.model" x-show="models.length" class="mono">
+                          <template x-for="m in models" :key="'l' + m.id"><option :value="m.id" x-text="m.name ? (m.id + '  (' + m.name + ')') : m.id"></option></template>
+                        </select>
+                        <input x-show="!models.length" x-model="llmForm.model" placeholder="claude-opus-5" class="mono">
+                        <span class="hint" x-text="models.length ? models.length + ' models available to this account' : 'The models load after the sign-in completes.'"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="steps" x-show="llmForm.provider && llmForm.auth === 'api_key'" style="margin-top:4px">
+                    <b>1</b><div class="stack" style="gap:10px">
+                      <div class="grid-2">
+                        <label class="field"><span>API key</span><input type="password" x-model="llmForm.api_key" :placeholder="llmInfo && llmInfo.key_set && llmInfo.provider === llmForm.provider ? ('saved ' + llmInfo.key_hint + '; type to replace') : providerSpec().key_hint" class="mono"><span class="hint" x-show="providerSpec().docs_url">Get one at <a :href="providerSpec().docs_url" target="_blank" rel="noopener" x-text="providerSpec().docs_url"></a></span></label>
+                        <label class="field" x-show="providerSpec().needs_region"><span>AWS region</span><input x-model="llmForm.region" placeholder="us-east-1" class="mono"></label>
+                        <label class="field" x-show="providerSpec().needs_base_url"><span>API base URL (OpenAI-compatible)</span><input x-model="llmForm.base_url" placeholder="https://api.example.com/v1" class="mono"></label>
+                      </div>
+                      <div class="row"><button type="button" class="btn" :disabled="busy" @click="loadModels()" x-text="modelsLoading ? 'Checking the key...' : 'Connect and load models'"></button><span class="small muted" x-text="modelsNote"></span></div>
+                    </div>
+                    <b>2</b><div class="stack" style="gap:10px" :style="models.length ? '' : 'opacity:.55'">
+                      <label class="field"><span>Model</span>
+                        <select x-model="llmForm.model" x-show="models.length" class="mono">
+                          <template x-for="m in models" :key="m.id"><option :value="m.id" x-text="m.name ? (m.id + '  (' + m.name + ')') : m.id"></option></template>
+                        </select>
+                        <input x-show="!models.length" x-model="llmForm.model" :placeholder="providerSpec().default_model || 'load the models above, or type a model id'" class="mono">
+                        <span class="hint" x-text="models.length ? models.length + ' models available for this key; the recommended one is preselected' : 'Load the models with the button above, or type a model id.'"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <label class="field" x-show="llmForm.provider" style="max-width:360px"><span>Thinking effort</span>
+                    <select x-model="llmForm.effort">
+                      <template x-for="e in effortOptions()" :key="e"><option :value="e" x-text="e === 'default' ? 'default (provider decides)' : e"></option></template>
+                    </select>
+                    <span class="hint">low is fastest and cheapest; high is right for repository analysis and documents; xhigh and max exist for Anthropic only.</span>
+                  </label>
+                  <div class="row"><button type="submit" class="btn btn-primary" :disabled="busy" x-text="llmForm.provider ? 'Save' : 'Disconnect'"></button><button type="button" class="btn" :disabled="busy || !llmEnabled()" @click="testLlm()">Test connection</button><span class="small muted" x-text="llmTest"></span></div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div x-show="page === 'settings'" class="stack">
+            <form class="card card-pad grid-2" @submit.prevent="saveSettings()">
+              <label class="field"><span>Display name</span><input x-model="settingsForm.project_name"></label>
+              <label class="field"><span>Vault branch</span><input x-model="settingsForm.git_branch" class="mono"></label>
+              <label class="field" style="grid-column:1/-1"><span>Vault Git remote (optional backup of the brain files)</span><input x-model="settingsForm.git_remote_url" placeholder="https://TOKEN@github.com/org/acme-brain.git" class="mono"><span class="hint">Every change is pushed there. Currently: <span class="mono" x-text="current.git_remote_url || 'none'"></span></span></label>
+              <div style="grid-column:1/-1"><button type="submit" class="btn btn-primary" :disabled="busy">Save settings</button></div>
+            </form>
+            <div class="card card-pad stack">
+              <h3>Vault backup</h3>
+              <div class="row"><button class="btn" @click="exportVault()">Export zip</button><label class="btn" style="cursor:pointer">Import zip<input type="file" accept=".zip" style="display:none" @change="importVault($event)"></label></div>
+            </div>
+            <div class="card card-pad stack">
+              <h3>Backup repository on GitHub</h3>
+              <p class="muted" x-show="current.backup_repo">Every change is pushed to <a :href="current.backup_url" target="_blank" rel="noopener" x-text="current.backup_repo"></a>.</p>
+              <p class="muted" x-show="!current.backup_repo">No backup repository yet. One click creates a private <span class="mono" x-text="current.project_id + '_brain'"></span> repository on your GitHub and pushes every change there.</p>
+              <div class="row" x-show="!current.backup_repo">
+                <button class="btn btn-primary btn-sm" :disabled="busy || !githubAccount.connected" @click="createBackup()">Create backup repository</button>
+                <span class="small muted" x-show="!githubAccount.connected">Connect your GitHub account on the GitHub &amp; LLM page first.</span>
+              </div>
+            </div>
+            <p class="small muted">To delete this project use the Delete button at the top of the page.Delete permanently</button></div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </section>
+  </div>
+</div>
+
+<div x-show="authed && newProjectOpen" class="backdrop" @click.self="newProjectOpen = false">
+  <form class="modal" @submit.prevent="createProject()">
+    <div class="card-head"><h2>New project</h2><button type="button" class="btn btn-ghost btn-sm" @click="newProjectOpen = false">close</button></div>
+    <div class="card-pad stack">
+      <p class="muted">The project ID, the first API key and the MCP connection are generated from the name.</p>
+      <label class="field"><span>Company or project name</span><input x-model="newProject.name" placeholder="Acme Corp" required x-ref="newProjectInput"></label>
+      <label class="field"><span>Company GitHub repository (optional)</span><input x-model="newProject.repo_url" placeholder="https://github.com/org/repo" class="mono"><span class="hint">Pushes land in the company log; with an LLM the brain reads the code and fills itself.</span></label>
+      <div class="card card-pad stack" style="background:var(--surface-2);gap:8px">
+        <label class="switch"><input type="checkbox" x-model="newProject.backup"> <span>Create a private backup repository <span class="mono" x-text="slugPreview(newProject.name) + '_brain'"></span> on GitHub<span x-show="githubAccount.connected" x-text="' (' + githubAccount.owner + ')'"></span> and push every change there</span></label>
+        <label class="field" x-show="newProject.backup && !githubAccount.connected"><span>GitHub token with the repo scope</span><input type="password" x-model="newProject.token" placeholder="ghp_... or github_pat_..." class="mono"><span class="hint">Saved once for all projects. Create one at github.com &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens.</span></label>
+      </div>
+      <button type="submit" class="btn btn-primary" :disabled="busy" style="align-self:flex-start">Create project</button>
+    </div>
+  </form>
+</div>
+
+<div x-show="authed && deleteOpen" class="backdrop" @click.self="deleteOpen = false">
+  <div class="modal" style="border-color:color-mix(in srgb,var(--danger) 55%,var(--border-strong))">
+    <div class="card-head"><h2 style="color:var(--danger)" x-text="'Delete ' + (current ? current.project_name : '')"></h2><button type="button" class="btn btn-ghost btn-sm" @click="deleteOpen = false">close</button></div>
+    <div class="card-pad stack">
+      <p>This removes the vault with all brain files, every API key, the documents, the ledger and the proposals of <span class="mono" x-text="current && current.project_id"></span>. Connected agents lose access immediately.</p>
+      <label class="switch" x-show="current && current.backup_repo"><input type="checkbox" x-model="deleteBackupToo"> <span>Also delete the backup repository <span class="mono" x-text="current && current.backup_repo"></span> on GitHub (needs the delete_repo scope)</span></label>
+      <p class="small muted" x-show="current && current.backup_repo && !deleteBackupToo">The backup repository stays on GitHub with the full history.</p>
+      <div class="row" x-show="deleteStep === 1"><button class="btn btn-danger" @click="deleteStep = 2">Delete this project</button><button class="btn btn-ghost" @click="deleteOpen = false">Cancel</button></div>
+      <div class="row" x-show="deleteStep === 2"><span style="font-weight:500">Step 2 of 2: are you sure?</span><button class="btn btn-danger" :disabled="busy" @click="deleteProject()" x-text="'Yes, delete ' + (current ? current.project_id : '') + ' permanently'"></button><button class="btn btn-ghost" @click="deleteOpen = false">Keep it</button></div>
+    </div>
+  </div>
+</div>
+
+<div x-show="authed && addAgentOpen" class="backdrop" @click.self="addAgentOpen = false">
+  <form class="modal" @submit.prevent="addAgent()">
+    <div class="card-head"><h2>Add an agent</h2><button type="button" class="btn btn-ghost btn-sm" @click="addAgentOpen = false">close</button></div>
+    <div class="card-pad stack">
+      <p class="muted">Creates the API key for one agent. You get the key and the exact command to paste into that agent; the key identifies the agent on every call and stays viewable on the Overview.</p>
+      <label class="field"><span>What is this agent?</span><input x-model="agentForm.name" placeholder="Sales Hermes on VPS 1" required x-ref="agentInput"><span class="hint">Name it after its job. "Sales", "marketing", "engineering", "ops" or "design" in the name picks the role; anything else gets admin.</span></label>
+      <details class="small"><summary class="muted" style="cursor:pointer">Choose the role yourself</summary>
+        <select x-model="agentForm.role" style="margin-top:8px"><option value="">auto from the name</option><template x-for="r in roles" :key="r"><option :value="r" x-text="r"></option></template></select></details>
+      <button type="submit" class="btn btn-primary" :disabled="busy" style="align-self:flex-start">Create API key</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const PALETTES = {
+  ocean: ['#38bdf8', '#a78bfa'], ember: ['#fb923c', '#f472b6'], forest: ['#4ade80', '#2dd4bf'], violet: ['#c084fc', '#60a5fa'],
+  sunset: ['#f472b6', '#fb923c'], mint: ['#2dd4bf', '#a3e635'], gold: ['#fbbf24', '#f97316'], mono: ['#e6edf3', '#94a3b8'],
+};
+const GLYPHS = {
+  A: ['.###.', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+  I: ['###', '.#.', '.#.', '.#.', '.#.', '.#.', '###'],
+};
+function mix(hex, target, amount) {
+  const n = parseInt(hex.slice(1), 16); if (isNaN(n)) return hex;
+  const c = [n >> 16 & 255, n >> 8 & 255, n & 255].map((v, i) => Math.round(v + (target[i] - v) * amount));
+  return '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function brainAdmin() {
+  return {
+    apiBase: '', token: '', authed: false, busy: false, error: '', status: null, themeMode: 'dark',
+    projects: [], current: null, page: 'overview',
+    pages: [
+      {id: 'overview', label: 'Overview'}, {id: 'agents', label: 'Agents'}, {id: 'files', label: 'Brain files'},
+      {id: 'documents', label: 'Documents'}, {id: 'assistant', label: 'Assistant'}, {id: 'activity', label: 'Activity'}, {id: 'approvals', label: 'Approvals'},
+      {id: 'rules', label: 'Rules'}, {id: 'sync', label: 'GitHub & LLM'}, {id: 'settings', label: 'Settings'},
+    ],
+    keys: [], roles: [], sessions: [], issued: null, snippet: 'claude_code', pendingRevoke: null, pendingReissue: null, connectAgent: '', connect: null, showKey: false,
+    snippetNames: ['claude_code', 'hermes', 'openclaw', 'mcp_json', 'python', 'events_curl'],
+    newProjectOpen: false, newProject: {name: '', repo_url: '', backup: true, token: ''}, addAgentOpen: false, agentForm: {name: '', role: ''},
+    githubAccount: {connected: false, owner: '', token_hint: ''}, githubTokenInput: '', deleteOpen: false, deleteStep: 1, deleteBackupToo: false,
+    oauth: null, oauthFlow: null, oauthCode: '', oauthWaiting: false, showSource: false, geminiProject: '',
+    files: [], activeFile: null, fileDoc: null, fileMode: 'view', editor: {content: '', summary: '', etag: '', heading: '', slug: ''}, conflict: null,
+    uploadPlan: null, uploadMode: 'replace',
+    documents: [], docForm: {file: null, title: '', mode: 'all', agents: []}, dragOver: false, docPreview: null, pendingDelete: null, accessEdit: null, accessForm: {mode: 'all', agents: [], title: ''},
+    log: [], diff: null, stream: null, streamLive: false, logTimer: null,
+    proposals: [], decisionNotes: {},
+    ruleSections: [
+      {slug: 'agent-rules', heading: 'Agent Rules', help: 'Bullet list. Served as the operating protocol in instructions, whoami and brain_bootstrap.'},
+      {slug: 'file-guide', heading: 'File Guide', help: 'Table: when the agent has just done X, update file#heading. Filtered per role by what it may write.'},
+      {slug: 'sync-policy', heading: 'Sync Policy', help: 'Table: role, watch list of files or file#heading, cadence. Drives relevance-filtered deltas and the sync banner.'},
+    ],
+    rules: {}, ruleDrafts: {},
+    github: null, githubForm: {repo_url: '', branch: '', token: '', analyze_on_push: true}, webhookSecret: '', analysis: null, analysisTimer: null,
+    llmInfo: null, llmForm: {provider: '', api_key: '', model: '', base_url: '', region: 'us-east-1', auth: 'api_key', effort: 'default'}, llmTest: '', models: [], modelsLoading: false, modelsNote: '', login: null, loginFlow: null, loginCode: '',
+    chat: {messages: [], input: '', busy: false, pending: []},
+    settingsForm: {project_name: '', git_remote_url: '', git_branch: 'main'}, deleteConfirm: '',
+    toasts: [],
+
+    init() {
+      const meta = document.querySelector('meta[name="brain-api-base"]');
+      try {
+        this.apiBase = (localStorage.getItem('brain.apiBase') || (meta && meta.content) || '').replace(/\/$/, '');
+        this.token = sessionStorage.getItem('brain.token') || '';
+        this.themeMode = localStorage.getItem('brain.mode') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      } catch (e) {}
+      this.applyMode();
+      const params = new URLSearchParams(location.search);
+      if (params.get('key')) {
+        this.token = params.get('key');
+        try { history.replaceState({}, '', location.pathname); } catch (e) {}
+      }
+      if (this.token) this.login(true);
+    },
+
+    applyMode() {
+      document.documentElement.setAttribute('data-theme', this.themeMode);
+    },
+    toggleTheme() {
+      this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
+      try { localStorage.setItem('brain.mode', this.themeMode); } catch (e) {}
+      this.applyMode();
+    },
+    applyPalette(name) {
+      const pair = PALETTES[name] || PALETTES.ocean;
+      const root = document.documentElement.style;
+      root.setProperty('--accent', pair[0]);
+      root.setProperty('--accent-2', pair[1]);
+      root.setProperty('--accent-ink', '#06121a');
+    },
+    logoSvg(size) {
+      const name = this.status ? this.status.theme : 'ocean';
+      const pair = PALETTES[name] || PALETTES.ocean;
+      const bands = [mix(pair[0], [255, 255, 255], 0.45), pair[0], mix(pair[1], [0, 0, 0], 0.1)];
+      const rows = GLYPHS.A.map((r, i) => r + '.' + GLYPHS.I[i]);
+      const unit = size / 7;
+      let rects = '';
+      rows.forEach((row, y) => {
+        const color = y < 2 ? bands[0] : (y < 5 ? bands[1] : bands[2]);
+        [...row].forEach((px, x) => { if (px === '#') rects += `<rect x="${(x * unit).toFixed(2)}" y="${(y * unit).toFixed(2)}" width="${(unit + 0.2).toFixed(2)}" height="${(unit + 0.2).toFixed(2)}" fill="${color}"/>`; });
+      });
+      return `<svg width="${Math.round(size * 9 / 7)}" height="${size}" viewBox="0 0 ${(unit * 9).toFixed(2)} ${size}" aria-hidden="true">${rects}</svg>`;
+    },
+
+    headers(extra) { return Object.assign({Authorization: 'Bearer ' + this.token}, extra || {}); },
+
+    async api(method, path, body, opts) {
+      opts = opts || {};
+      const headers = this.headers(opts.ifMatch ? {'If-Match': opts.ifMatch} : {});
+      const init = {method, headers};
+      if (body instanceof FormData) init.body = body;
+      else if (body !== undefined) { headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
+      const res = await fetch(this.apiBase + '/api/admin' + path, init);
+      if (res.status === 401) { this.logout(); throw new Error('session expired, sign in again'); }
+      if (res.status === 204) return null;
+      if (opts.blob) { if (!res.ok) throw new Error('download failed (' + res.status + ')'); return await res.blob(); }
+      const type = res.headers.get('content-type') || '';
+      const data = type.includes('json') ? await res.json() : await res.text();
+      if (!res.ok) {
+        const err = new Error((data && (data.error || data.detail)) || res.statusText);
+        err.status = res.status; err.data = data; throw err;
+      }
+      return data;
+    },
+
+    async login(silent) {
+      this.busy = true; this.error = '';
+      try {
+        this.apiBase = (this.apiBase || '').replace(/\/$/, '');
+        this.status = await this.api('GET', '/status');
+        this.applyPalette(this.status.theme);
+        this.llmInfo = this.status.llm;
+        this.githubAccount = Object.assign({token_hint: ''}, this.status.github_account || {});
+        this.authed = true;
+        try { sessionStorage.setItem('brain.token', this.token); localStorage.setItem('brain.apiBase', this.apiBase); } catch (e) {}
+        await this.loadProjects();
+        if (this.projects.length && !this.current) await this.selectProject(this.projects[0]);
+      } catch (e) {
+        this.authed = false;
+        if (!silent) this.error = e.message || 'could not sign in';
+      } finally { this.busy = false; }
+    },
+
+    logout() {
+      this.stopStream(); clearInterval(this.analysisTimer);
+      this.authed = false; this.token = ''; this.current = null; this.projects = [];
+      try { sessionStorage.removeItem('brain.token'); } catch (e) {}
+    },
+
+    async refreshStatus() {
+      try { this.status = await this.api('GET', '/status'); this.llmInfo = this.status.llm; } catch (e) {}
+    },
+
+    async loadProjects() {
+      this.projects = await this.api('GET', '/projects');
+      if (this.current) {
+        const refreshed = this.projects.find(p => p.project_id === this.current.project_id);
+        if (refreshed) this.current = refreshed;
+      }
+    },
+
+    openNewProject() { this.newProjectOpen = true; this.$nextTick(() => this.$refs.newProjectInput && this.$refs.newProjectInput.focus()); },
+
+    slugPreview(name) {
+      return String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'project';
+    },
+    async loadGithubAccount() {
+      try { this.githubAccount = await this.api('GET', '/github-account'); } catch (e) {}
+    },
+    async connectGithubAccount(token) {
+      const value = (token || this.githubTokenInput || '').trim();
+      if (!value) return false;
+      this.busy = true;
+      try {
+        this.githubAccount = await this.api('PUT', '/github-account', {token: value});
+        this.githubTokenInput = '';
+        this.toast('GitHub account ' + this.githubAccount.owner + ' connected');
+        return true;
+      } catch (e) { this.toast(e.message, 'error'); return false; } finally { this.busy = false; }
+    },
+    async disconnectGithubAccount() {
+      this.busy = true;
+      try { this.githubAccount = await this.api('DELETE', '/github-account'); this.toast('GitHub account disconnected'); }
+      catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async createBackup() {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/backup');
+        await this.loadProjects();
+        this.toast('backup repository ' + result.backup.repo + (result.backup.reused ? ' reused' : ' created') + '; every change is pushed there');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async createProject() {
+      const name = (this.newProject.name || '').trim();
+      if (!name) return;
+      if (this.newProject.backup && !this.githubAccount.connected && this.newProject.token.trim()) {
+        const ok = await this.connectGithubAccount(this.newProject.token);
+        if (!ok) return;
+        this.newProject.token = '';
+      }
+      const body = {name, repo_url: (this.newProject.repo_url || '').trim() || null, backup: !!(this.newProject.backup && this.githubAccount.connected)};
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/quick', body);
+        this.newProject = {name: '', repo_url: '', backup: true, token: ''}; this.newProjectOpen = false;
+        await this.loadProjects();
+        const project = this.projects.find(p => p.project_id === result.project.project_id);
+        this.page = 'overview';
+        await this.selectProject(project || result.project);
+        result.justCreated = true;
+        this.issued = result; this.snippet = 'claude_code';
+        this.toast('project ' + result.project.project_id + ' created with its first API key');
+        if (result.backup_error) this.toast('backup repository: ' + result.backup_error, 'error');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    openAddAgent() { this.addAgentOpen = true; this.$nextTick(() => this.$refs.agentInput && this.$refs.agentInput.focus()); },
+
+    async addAgent() {
+      const body = {name: this.agentForm.name.trim(), project_id: this.current.project_id, role: this.agentForm.role || null};
+      if (!body.name) return;
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/keys/quick', body);
+        this.agentForm = {name: '', role: ''}; this.addAgentOpen = false;
+        this.keys = await this.api('GET', '/projects/' + this.current.project_id + '/keys');
+        await this.loadProjects();
+        this.issued = result; this.snippet = 'claude_code';
+        if (this.page !== 'overview') this.page = 'agents';
+        this.toast('API key created for ' + result.agent_id + ' as ' + result.role);
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    async selectProject(p) {
+      this.stopStream(); clearInterval(this.analysisTimer);
+      this.chat = {messages: [], input: '', busy: false, pending: []};
+      this.current = p; this.issued = null; this.fileDoc = null; this.activeFile = null; this.diff = null; this.webhookSecret = ''; this.deleteConfirm = ''; this.analysis = null; this.docPreview = null; this.uploadPlan = null; this.showSource = false; this.deleteOpen = false;
+      this.settingsForm = {project_name: p.project_name, git_remote_url: '', git_branch: p.git_branch || 'main'};
+      try {
+        this.roles = await this.api('GET', '/projects/' + p.project_id + '/roles');
+        this.keys = await this.api('GET', '/projects/' + p.project_id + '/keys');
+        this.documents = await this.api('GET', '/projects/' + p.project_id + '/documents');
+        await this.loadGithub();
+      } catch (e) { this.toast(e.message, 'error'); }
+      await this.setPage(this.page);
+      this.startStream();
+    },
+
+    async setPage(id) {
+      this.page = id;
+      if (!this.current) return;
+      const pid = this.current.project_id;
+      try {
+        if (id === 'overview') { await this.loadLog(); await this.loadGithub(); }
+        if (id === 'agents') { this.keys = await this.api('GET', '/projects/' + pid + '/keys'); this.loadConnect().catch(() => {}); this.sessions = await this.api('GET', '/projects/' + pid + '/sessions'); }
+        if (id === 'files') { this.files = await this.api('GET', '/projects/' + pid + '/files'); if (!this.activeFile && this.files.length) await this.openFile(this.files[0].file); }
+        if (id === 'documents') { this.documents = await this.api('GET', '/projects/' + pid + '/documents'); this.keys = await this.api('GET', '/projects/' + pid + '/keys'); this.loadConnect().catch(() => {}); }
+        if (id === 'activity') await this.loadLog();
+        if (id === 'approvals') await this.loadProposals();
+        if (id === 'rules') await this.loadRules();
+        if (id === 'sync') { await this.loadGithub(); await this.refreshStatus(); await this.loadGithubAccount(); this.resetLlmForm(); }
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+
+    async loadConnect() {
+      const active = (this.keys || []).filter(k => k.active);
+      if (!this.current || !active.length) { this.connect = null; return; }
+      if (!active.some(k => k.key_id === this.connectAgent)) this.connectAgent = active[0].key_id;
+      this.showKey = false;
+      this.connect = await this.api('GET', '/projects/' + this.current.project_id + '/keys/' + this.connectAgent + '/connect');
+    },
+    async showConnect(k) {
+      try {
+        const info = await this.api('GET', '/projects/' + this.current.project_id + '/keys/' + k.key_id + '/connect');
+        this.issued = {...info, project: this.current, reconnect: true}; this.snippet = 'claude_code';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+    async reissueKey(k) {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/keys/' + k.key_id + '/reissue');
+        this.pendingReissue = null;
+        this.keys = await this.api('GET', '/projects/' + this.current.project_id + '/keys');
+        this.issued = result; this.snippet = 'claude_code';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        this.toast('new key for ' + result.agent_id + '; the old one no longer works');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async revokeKey(k) {
+      try {
+        await this.api('DELETE', '/projects/' + this.current.project_id + '/keys/' + k.key_id);
+        this.pendingRevoke = null;
+        this.keys = await this.api('GET', '/projects/' + this.current.project_id + '/keys');
+        await this.loadProjects();
+        this.toast('key revoked; the agent lost access');
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+
+    async openFile(name) {
+      this.activeFile = name; this.fileMode = 'view'; this.conflict = null; this.uploadPlan = null;
+      this.fileDoc = await this.api('GET', '/projects/' + this.current.project_id + '/files/' + encodeURIComponent(name));
+    },
+    startEditFile() {
+      this.fileMode = 'file'; this.conflict = null;
+      this.editor = {content: this.fileDoc.content, summary: '', etag: this.fileDoc.etag, heading: this.activeFile, slug: ''};
+    },
+    async editSection(s) {
+      try {
+        const section = await this.api('GET', '/projects/' + this.current.project_id + '/files/' + encodeURIComponent(this.activeFile) + '/sections/' + encodeURIComponent(s.slug));
+        this.fileMode = 'section'; this.conflict = null;
+        this.editor = {content: section.content, summary: '', etag: section.etag, heading: section.heading, slug: section.slug};
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+    cancelEdit() { this.fileMode = 'view'; this.conflict = null; },
+    async saveEdit() {
+      this.busy = true; this.conflict = null;
+      const base = '/projects/' + this.current.project_id + '/files/' + encodeURIComponent(this.activeFile);
+      try {
+        if (this.fileMode === 'section') {
+          await this.api('PUT', base + '/sections/' + encodeURIComponent(this.editor.slug), {content: this.editor.content, compact_summary: this.editor.summary, mode: 'replace'}, {ifMatch: this.editor.etag});
+        } else {
+          await this.api('PUT', base, {content: this.editor.content, compact_summary: this.editor.summary}, {ifMatch: this.editor.etag});
+        }
+        this.toast('saved and broadcast to the agents');
+        this.files = await this.api('GET', '/projects/' + this.current.project_id + '/files');
+        await this.openFile(this.activeFile);
+      } catch (e) {
+        if (e.status === 409 && e.data) this.conflict = e.data; else this.toast(e.message, 'error');
+      } finally { this.busy = false; }
+    },
+    takeCurrent() {
+      if (!this.conflict) return;
+      this.editor.content = this.conflict.current_content; this.editor.etag = this.conflict.current_etag; this.conflict = null;
+    },
+    downloadFile() {
+      if (!this.fileDoc) return;
+      const blob = new Blob([this.fileDoc.content], {type: 'text/markdown'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = this.activeFile; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    },
+    uploadBrainFile(event) {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+      this.uploadPlan = {file, name: file.name}; this.uploadMode = 'replace';
+    },
+    async confirmUpload() {
+      if (!this.uploadPlan) return;
+      const form = new FormData(); form.append('upload', this.uploadPlan.file); form.append('mode', this.uploadMode);
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/files/' + encodeURIComponent(this.activeFile) + '/upload', form);
+        this.toast(this.activeFile + ' ' + (result.mode === 'smart' ? 'merged' : 'replaced') + '; agents see it on their next sync');
+        this.uploadPlan = null;
+        this.files = await this.api('GET', '/projects/' + this.current.project_id + '/files');
+        await this.openFile(this.activeFile);
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    pickDocument(list) {
+      const file = list && list[0];
+      if (!file) return;
+      this.docForm.file = file;
+      if (!this.docForm.title) this.docForm.title = '';
+    },
+    resetDocForm() { this.docForm = {file: null, title: '', mode: 'all', agents: []}; },
+    async uploadDocument() {
+      if (!this.docForm.file) return;
+      if (this.docForm.mode === 'custom' && !this.docForm.agents.length) { this.toast('tick at least one agent or role, or share with everyone', 'error'); return; }
+      const form = new FormData();
+      form.append('upload', this.docForm.file);
+      form.append('title', this.docForm.title || '');
+      form.append('access', this.docForm.mode === 'all' ? '*' : this.docForm.agents.join(','));
+      this.busy = true;
+      try {
+        const doc = await this.api('POST', '/projects/' + this.current.project_id + '/documents', form);
+        this.documents = await this.api('GET', '/projects/' + this.current.project_id + '/documents');
+        this.resetDocForm();
+        this.toast(doc.title + ' uploaded (' + Math.round(doc.text_chars / 1000) + 'k characters of text)');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async previewDocument(d) {
+      try { this.docPreview = await this.api('GET', '/projects/' + this.current.project_id + '/documents/' + d.doc_id); }
+      catch (e) { this.toast(e.message, 'error'); }
+    },
+    editAccess(d) {
+      this.accessEdit = d;
+      this.accessForm = {mode: d.shared_with_all ? 'all' : 'custom', agents: d.shared_with_all ? [] : [...d.access], title: d.title};
+    },
+    async saveAccess() {
+      if (this.accessForm.mode === 'custom' && !this.accessForm.agents.length) { this.toast('tick at least one agent or role', 'error'); return; }
+      this.busy = true;
+      try {
+        await this.api('PUT', '/projects/' + this.current.project_id + '/documents/' + this.accessEdit.doc_id, {title: this.accessForm.title, access: this.accessForm.mode === 'all' ? ['*'] : this.accessForm.agents});
+        this.documents = await this.api('GET', '/projects/' + this.current.project_id + '/documents');
+        this.accessEdit = null;
+        this.toast('sharing updated');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async deleteDocument(d) {
+      try {
+        await this.api('DELETE', '/projects/' + this.current.project_id + '/documents/' + d.doc_id);
+        this.pendingDelete = null; if (this.docPreview && this.docPreview.doc_id === d.doc_id) this.docPreview = null;
+        this.documents = await this.api('GET', '/projects/' + this.current.project_id + '/documents');
+        this.toast('document removed');
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+
+    async loadLog() { this.log = await this.api('GET', '/projects/' + this.current.project_id + '/log/recent?limit=200'); },
+    scheduleLogRefresh() {
+      clearTimeout(this.logTimer);
+      this.logTimer = setTimeout(() => { if ((this.page === 'activity' || this.page === 'overview') && this.current) this.loadLog().catch(() => {}); this.loadProjects().catch(() => {}); }, 400);
+    },
+    async showDiff(e) {
+      try { this.diff = await this.api('GET', '/projects/' + this.current.project_id + '/log/' + e.log_id + '/diff'); }
+      catch (err) { this.toast(err.message, 'error'); }
+    },
+
+    startStream() {
+      const controller = new AbortController();
+      this.stream = controller;
+      const pid = this.current.project_id;
+      const self = this;
+      (async () => {
+        let attempt = 0;
+        while (self.stream === controller) {
+          try {
+            const res = await fetch(self.apiBase + '/api/admin/projects/' + pid + '/events', {headers: self.headers(), signal: controller.signal});
+            if (!res.ok) throw new Error('stream ' + res.status);
+            self.streamLive = true; attempt = 0;
+            const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+            while (true) {
+              const {value, done} = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, {stream: true});
+              let idx;
+              while ((idx = buffer.indexOf('\n\n')) >= 0) {
+                const chunk = buffer.slice(0, idx); buffer = buffer.slice(idx + 2);
+                const line = chunk.split('\n').find(l => l.startsWith('data: '));
+                if (line) { try { self.onEvent(JSON.parse(line.slice(6))); } catch (e) {} }
+              }
+            }
+          } catch (e) { if (controller.signal.aborted) break; }
+          self.streamLive = false;
+          attempt += 1;
+          await new Promise(r => setTimeout(r, Math.min(15000, 1000 * Math.pow(2, attempt))));
+        }
+      })();
+    },
+    stopStream() {
+      if (this.stream) { this.stream.abort(); this.stream = null; }
+      this.streamLive = false;
+    },
+    onEvent(ev) {
+      if (!ev || !ev.type) return;
+      this.scheduleLogRefresh();
+      if (ev.type.startsWith('proposal') && this.page === 'approvals') this.loadProposals().catch(() => {});
+      if (this.page === 'files' && ev.file && ev.file === this.activeFile && this.fileMode === 'view') this.openFile(this.activeFile).catch(() => {});
+      if (ev.type === 'repo_analysis' && this.page === 'sync') this.pollAnalysis();
+      if (this.page === 'agents') this.setPage('agents').catch(() => {});
+    },
+
+    async loadProposals() { this.proposals = await this.api('GET', '/projects/' + this.current.project_id + '/proposals?status=pending'); },
+    async decide(p, approve) {
+      this.busy = true;
+      try {
+        await this.api('POST', '/projects/' + this.current.project_id + '/proposals/' + p.proposal_id + '/' + (approve ? 'approve' : 'reject'), {note: this.decisionNotes[p.proposal_id] || null});
+        this.toast(approve ? 'approved and applied' : 'rejected');
+        await this.loadProposals(); await this.loadProjects();
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    async loadRules() {
+      for (const r of this.ruleSections) {
+        try {
+          const section = await this.api('GET', '/projects/' + this.current.project_id + '/files/ACCESS_PERMISSIONS.md/sections/' + r.slug);
+          this.rules[r.slug] = section; this.ruleDrafts[r.slug] = section.content;
+        } catch (e) { this.rules[r.slug] = null; this.ruleDrafts[r.slug] = ''; }
+      }
+    },
+    async saveRule(r) {
+      this.busy = true;
+      try {
+        const current = this.rules[r.slug];
+        const body = {content: this.ruleDrafts[r.slug], compact_summary: r.heading + ' updated by admin', mode: current ? 'replace' : 'create'};
+        await this.api('PUT', '/projects/' + this.current.project_id + '/files/ACCESS_PERMISSIONS.md/sections/' + r.slug, body, current ? {ifMatch: current.etag} : {});
+        this.toast(r.heading + ' saved; agents receive it on their next whoami');
+        await this.loadRules();
+      } catch (e) {
+        if (e.status === 409) this.toast('this section changed meanwhile; reloaded the current version', 'error'); else this.toast(e.message, 'error');
+        await this.loadRules();
+      } finally { this.busy = false; }
+    },
+
+    async loadGithub() {
+      if (!this.current) return;
+      this.github = await this.api('GET', '/projects/' + this.current.project_id + '/github');
+      this.githubForm = {repo_url: this.github.repo_url, branch: this.github.branch, token: '', analyze_on_push: this.github.analyze_on_push};
+      if (this.github.analysis && this.github.analysis.state !== 'idle') { this.analysis = this.github.analysis; if (this.analysis.state === 'running') this.pollAnalysis(); }
+    },
+    async saveGithub() {
+      this.busy = true;
+      try {
+        const body = {repo_url: this.githubForm.repo_url.trim(), branch: this.githubForm.branch.trim(), analyze_on_push: this.githubForm.analyze_on_push};
+        if (this.githubForm.token) body.token = this.githubForm.token;
+        const result = await this.api('PUT', '/projects/' + this.current.project_id + '/github', body);
+        if (result.webhook_secret) this.webhookSecret = result.webhook_secret;
+        this.github = result; this.githubForm.token = '';
+        await this.loadProjects();
+        this.toast('repository saved' + (result.webhook_secret ? '; add the webhook in GitHub with the secret shown' : ''));
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async disconnectGithub() {
+      this.busy = true;
+      try { this.github = await this.api('DELETE', '/projects/' + this.current.project_id + '/github'); this.githubForm = {repo_url: '', branch: '', token: '', analyze_on_push: true}; this.analysis = null; await this.loadProjects(); this.toast('repository disconnected'); }
+      catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async rotateWebhook() {
+      this.busy = true;
+      try { const result = await this.api('POST', '/projects/' + this.current.project_id + '/webhook-secret'); this.webhookSecret = result.webhook_secret; await this.loadGithub(); await this.loadProjects(); }
+      catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async runAnalysis() {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/github/analyze');
+        this.analysis = result.analysis;
+        this.pollAnalysis();
+        this.toast(result.started ? 'analysis started' : 'an analysis is already running');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    pollAnalysis() {
+      clearInterval(this.analysisTimer);
+      const pid = this.current.project_id;
+      this.analysisTimer = setInterval(async () => {
+        try {
+          this.analysis = await this.api('GET', '/projects/' + pid + '/github/analysis');
+          if (this.analysis.state !== 'running') { clearInterval(this.analysisTimer); this.github = await this.api('GET', '/projects/' + pid + '/github'); await this.loadProjects(); if (this.analysis.state === 'done') this.toast('analysis finished: ' + this.analysis.result.sections_updated + ' sections updated'); }
+        } catch (e) { clearInterval(this.analysisTimer); }
+      }, 1500);
+    },
+
+    llmEnabled() { return !!(this.llmInfo && this.llmInfo.enabled); },
+    effortOptions() {
+      return this.llmForm.provider === 'anthropic' ? ['default', 'low', 'medium', 'high', 'xhigh', 'max'] : ['default', 'low', 'medium', 'high'];
+    },
+    providerSpec() {
+      const list = this.llmInfo ? this.llmInfo.providers : [];
+      return list.find(p => p.key === this.llmForm.provider) || {key_hint: '', default_model: '', docs_url: '', needs_base_url: false, base_url: ''};
+    },
+    resetLlmForm() {
+      if (!this.llmInfo) return;
+      const region = (this.llmInfo.base_url.match(/bedrock-runtime\.([a-z0-9-]+)\.amazonaws/) || [])[1] || 'us-east-1';
+      this.llmForm = {provider: this.llmInfo.provider || '', api_key: '', model: this.llmInfo.provider ? this.llmInfo.model : '', base_url: this.llmInfo.provider === 'custom' ? this.llmInfo.base_url : '', region, auth: this.llmInfo.auth || 'api_key', effort: this.llmInfo.effort || 'default'};
+      this.llmTest = ''; this.models = []; this.modelsNote = ''; this.oauthFlow = null; this.oauthCode = '';
+      this.api('GET', '/llm/login').then(r => { this.login = r; }).catch(() => {});
+      this.api('GET', '/llm/oauth').then(r => { this.oauth = r; }).catch(() => {});
+    },
+    oauthSpec() {
+      const all = this.oauth && this.oauth.providers ? this.oauth.providers : {};
+      return all[this.llmForm.provider] || {};
+    },
+    async startOAuth() {
+      this.busy = true; this.oauthCode = '';
+      try {
+        this.oauthFlow = await this.api('POST', '/llm/oauth/start', {provider: this.llmForm.provider, local_server: true});
+        window.open(this.oauthFlow.url, '_blank', 'noopener');
+        if (this.oauthFlow.listening) this.pollOAuth();
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async pollOAuth() {
+      this.oauthWaiting = true;
+      try {
+        for (let i = 0; i < 12 && this.oauthWaiting; i++) {
+          const result = await this.api('POST', '/llm/oauth/wait');
+          if (result.received) { await this.completeOAuth(''); return; }
+        }
+      } catch (e) {} finally { this.oauthWaiting = false; }
+    },
+    async completeOAuth(code) {
+      this.busy = true; this.oauthWaiting = false;
+      try {
+        const result = await this.api('POST', '/llm/oauth/complete', {code: code || '', model: this.llmForm.model || null});
+        this.llmInfo = result; this.models = result.models || []; this.llmForm.model = result.model; this.llmForm.auth = 'oauth'; this.oauthFlow = null; this.oauthCode = '';
+        await this.refreshStatus();
+        this.oauth = await this.api('GET', '/llm/oauth');
+        const who = result.account && result.account.account ? ' as ' + result.account.account : '';
+        this.toast('signed in' + who + '; ' + this.models.length + ' models available');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async useExistingSignIn() {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/llm/models', {provider: this.llmForm.provider, auth: 'oauth'});
+        this.models = result.models; this.llmForm.model = (this.models.find(m => m.id === this.llmForm.model) || this.models.find(m => m.id === result.default) || this.models[0]).id;
+        this.modelsNote = this.models.length + ' models';
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async setGeminiProject() {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/llm/oauth/gemini-project', {project: this.geminiProject.trim()});
+        this.oauth = await this.api('GET', '/llm/oauth');
+        this.toast('project accepted; Gemini answered in ' + result.check.latency_ms + ' ms');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async signOutOAuth() {
+      this.busy = true;
+      try { await this.api('DELETE', '/llm/oauth/' + this.llmForm.provider); this.oauth = await this.api('GET', '/llm/oauth'); await this.refreshStatus(); this.models = []; this.toast('signed out'); }
+      catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async startLogin() {
+      this.busy = true;
+      try { this.loginFlow = await this.api('POST', '/llm/login/start'); this.loginCode = ''; }
+      catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async completeLogin() {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/llm/login/complete', {code: this.loginCode.trim(), model: this.llmForm.model || null});
+        this.llmInfo = result; this.models = result.models || []; this.llmForm.model = result.model; this.llmForm.auth = 'login'; this.loginFlow = null; this.loginCode = '';
+        await this.refreshStatus();
+        this.login = await this.api('GET', '/llm/login');
+        this.toast('signed in to Anthropic; ' + this.models.length + ' models available');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    escapeHtml(text) {
+      return String(text || '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c])).replace(/\n/g, '<br>');
+    },
+    async sendChat() {
+      const text = this.chat.input.trim();
+      if (!text || this.chat.busy) return;
+      this.chat.messages.push({role: 'user', content: text});
+      this.chat.input = ''; this.chat.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/chat', {messages: this.chat.messages.slice(-16)});
+        this.chat.messages.push({role: 'assistant', content: result.reply});
+        if (result.changes && result.changes.length) this.chat.pending = result.changes;
+      } catch (e) { this.chat.messages.pop(); this.chat.input = text; this.toast(e.message, 'error'); } finally { this.chat.busy = false; }
+    },
+    async applyChanges(changes) {
+      this.busy = true;
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/chat/apply', {changes});
+        const failed = result.results.filter(r => !r.ok);
+        this.chat.pending = this.chat.pending.filter(c => !changes.includes(c));
+        this.toast(result.applied + ' change(s) applied and broadcast to the agents' + (failed.length ? '; ' + failed.length + ' failed: ' + failed[0].error : ''), failed.length ? 'error' : 'ok');
+        await this.loadProjects();
+        if (this.page === 'files' && this.activeFile) await this.openFile(this.activeFile);
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    pickProvider(p) {
+      this.llmForm.provider = p.key;
+      this.llmForm.model = (this.llmInfo && this.llmInfo.provider === p.key) ? this.llmInfo.model : '';
+      this.llmForm.base_url = p.needs_base_url && this.llmInfo && this.llmInfo.provider === p.key ? this.llmInfo.base_url : '';
+      this.llmForm.auth = (this.llmInfo && this.llmInfo.provider === p.key && this.llmInfo.auth) || (p.oauth ? 'oauth' : 'api_key');
+      this.models = []; this.modelsNote = ''; this.oauthFlow = null;
+    },
+    async loadModels() {
+      const body = {provider: this.llmForm.provider, base_url: this.llmForm.base_url, region: this.llmForm.region, auth: this.llmForm.auth};
+      if (this.llmForm.api_key) body.api_key = this.llmForm.api_key;
+      this.modelsLoading = true; this.modelsNote = '';
+      try {
+        const result = await this.api('POST', '/llm/models', body);
+        this.models = result.models;
+        if (result.base_url) this.llmForm.base_url = result.base_url;
+        const keep = this.models.find(m => m.id === this.llmForm.model);
+        this.llmForm.model = keep ? keep.id : (this.models.find(m => m.id === result.default) || this.models[0]).id;
+        this.modelsNote = 'key accepted, ' + this.models.length + ' models';
+      } catch (e) { this.models = []; this.modelsNote = ''; this.toast(e.message, 'error'); } finally { this.modelsLoading = false; }
+    },
+    async saveLlm() {
+      this.busy = true;
+      try {
+        const body = {provider: this.llmForm.provider, model: this.llmForm.model, base_url: this.llmForm.base_url, auth: this.llmForm.auth || 'api_key', effort: this.llmForm.effort === 'default' ? '' : this.llmForm.effort};
+        if (this.llmForm.provider === 'bedrock') body.base_url = 'https://bedrock-runtime.' + (this.llmForm.region || 'us-east-1').trim().toLowerCase() + '.amazonaws.com/openai/v1';
+        if (this.llmForm.api_key) body.api_key = this.llmForm.api_key;
+        this.llmInfo = await this.api('PUT', '/llm', body);
+        this.llmForm.api_key = '';
+        await this.refreshStatus();
+        this.toast(this.llmInfo.enabled ? this.llmInfo.provider_label + ' connected with ' + this.llmInfo.model : (this.llmForm.provider ? 'saved, but an API key is still missing' : 'LLM disconnected'));
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async testLlm() {
+      this.busy = true; this.llmTest = 'asking the model to say OK...';
+      try { const r = await this.api('POST', '/llm/test'); this.llmTest = r.provider + ' answered in ' + r.latency_ms + ' ms (' + r.model + ': ' + r.reply + ')'; }
+      catch (e) { this.llmTest = ''; this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    async saveSettings() {
+      this.busy = true;
+      try {
+        const body = {project_name: this.settingsForm.project_name, git_branch: this.settingsForm.git_branch};
+        if (this.settingsForm.git_remote_url) body.git_remote_url = this.settingsForm.git_remote_url;
+        const updated = await this.api('PUT', '/projects/' + this.current.project_id + '/settings', body);
+        this.settingsForm.git_remote_url = '';
+        await this.loadProjects();
+        this.current = this.projects.find(p => p.project_id === updated.project_id) || updated;
+        this.toast('settings saved');
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+    async exportVault() {
+      try {
+        const blob = await this.api('GET', '/projects/' + this.current.project_id + '/export', undefined, {blob: true});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = this.current.project_id + '-vault.zip'; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (e) { this.toast(e.message, 'error'); }
+    },
+    async importVault(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const form = new FormData(); form.append('archive', file);
+      try {
+        const result = await this.api('POST', '/projects/' + this.current.project_id + '/import', form);
+        this.toast('imported ' + result.written.length + ' files');
+        if (this.page === 'files') await this.setPage('files');
+      } catch (e) { this.toast(e.message, 'error'); } finally { event.target.value = ''; }
+    },
+    openDelete() { this.deleteStep = 1; this.deleteBackupToo = false; this.deleteOpen = true; },
+    async deleteProject() {
+      this.busy = true;
+      try {
+        const outcome = await this.api('DELETE', '/projects/' + this.current.project_id + (this.deleteBackupToo ? '?delete_backup=true' : ''));
+        this.deleteOpen = false;
+        this.toast('project deleted' + (outcome && outcome.backup_deleted ? ', backup repository removed' : '') + (outcome && outcome.backup_error ? '; backup kept: ' + outcome.backup_error : ''));
+        this.stopStream(); this.current = null; this.deleteConfirm = '';
+        await this.loadProjects();
+        if (this.projects.length) await this.selectProject(this.projects[0]);
+      } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
+    },
+
+    snippetLabel(name) {
+      return {claude_code: 'Claude Code', hermes: 'Hermes', openclaw: 'OpenClaw', mcp_json: 'Cursor / mcp.json', python: 'Python', events_curl: 'SSE curl'}[name] || name;
+    },
+    rendered(markdown) {
+      if (!markdown || typeof marked === 'undefined') return '';
+      const html = marked.parse(markdown, {mangle: false, headerIds: false});
+      return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(html) : html;
+    },
+    shortTarget(uri) {
+      if (!uri) return '';
+      const path = uri.replace(/^[a-z]+:\/\//, '');
+      return path.includes('/') ? path.slice(path.indexOf('/') + 1) : path;
+    },
+    fmtTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return isNaN(d) ? iso : d.toLocaleString();
+    },
+    fmtShort(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      const today = new Date();
+      return d.toDateString() === today.toDateString() ? d.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+    },
+    fmtSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+    },
+    async copy(text) {
+      try { await navigator.clipboard.writeText(text); this.toast('copied'); }
+      catch (e) { this.toast('copy failed, select the text manually', 'error'); }
+    },
+    toast(message, kind) {
+      const id = Date.now() + Math.random();
+      this.toasts.push({id, message, kind: kind || 'ok'});
+      setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, kind === 'error' ? 6000 : 3000);
+    },
+  };
+}
+</script>
+</body>
+</html>

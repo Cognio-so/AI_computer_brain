@@ -1,0 +1,12 @@
+{$BRAIN_DOMAIN} {
+    header -Server
+    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    reverse_proxy brain-server:8000 {
+        flush_interval -1
+        transport http {
+            read_timeout 24h
+            write_timeout 24h
+        }
+    }
+}
