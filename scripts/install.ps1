@@ -1,21 +1,22 @@
 $ErrorActionPreference = "Stop"
 
-$Repo = if ($env:BRAIN_REPO_URL) { $env:BRAIN_REPO_URL } else { "https://github.com/Cognio-so/AI_computer_brain" }
-$Dir = if ($env:BRAIN_INSTALL_DIR) { $env:BRAIN_INSTALL_DIR } else { Join-Path $HOME "ai-computer-brain" }
+$Package = if ($env:BRAIN_PACKAGE) { $env:BRAIN_PACKAGE } else { "git+https://github.com/Cognio-so/AI_computer_brain" }
 
 function Say($message) { Write-Host "[brain] $message" -ForegroundColor Cyan }
 
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Say "installing git (one time)"
-    winget install --id Git.Git -e --silent --accept-source-agreements --accept-package-agreements
-    $env:Path = "$env:ProgramFiles\Git\cmd;$env:Path"
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    Say "installing uv, the Python manager (one time)"
+    Invoke-RestMethod https://astral.sh/uv/install.ps1 | Invoke-Expression
+    $env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
+}
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    throw "uv was installed but is not on PATH yet. Open a new PowerShell window and run this command again."
 }
 
-if (-not (Test-Path (Join-Path $Dir ".git"))) {
-    Say "downloading AI Computer Brain into $Dir"
-    git clone --depth 1 $Repo $Dir
-}
+Say "installing AI Computer Brain (Python 3.12 is downloaded if needed)"
+uv tool install --python 3.12 --force $Package
+try { uv tool update-shell | Out-Null } catch {}
+$env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
 
-Set-Location $Dir
-Say "setting up and starting the console (the first run asks a few questions)"
-& (Join-Path $Dir "start.ps1")
+Say "installed. Its folder is $env:USERPROFILE\.brain. Starting the console; next time just type: brain"
+brain

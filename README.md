@@ -36,28 +36,30 @@ Works with Hermes, OpenClaw, Claude Code, Cursor, custom Python agents, Slack or
 
 ## Quick install
 
-```bash
-pipx install ai-computer-brain        # or: uv tool install ai-computer-brain
-brain                                 # first run: a short setup, then the console
-```
-
-No clone needed, on a laptop or a VPS. `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one. Until the package is on PyPI, install it straight from GitHub:
-
-```bash
-pipx install git+https://github.com/Cognio-so/AI_computer_brain
-```
-
-One-liners that install the prerequisites too:
+Linux, macOS and WSL:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.sh | bash
 ```
 
+Windows PowerShell:
+
 ```powershell
 iex (irm https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.ps1)
 ```
 
-From source, for development: `git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain && ./start.sh` (Windows: `start.cmd`). The script creates the environment, installs, and opens the console.
+That is the whole install. The one-liner installs `uv` (the Python manager) if it is missing, downloads Python 3.12 if needed, installs the brain as a tool and starts the console. No clone, no pipx, nothing to install first. Next time, type `brain`.
+
+Already have `uv` or `pipx`? Then one command does the same:
+
+```bash
+uv tool install git+https://github.com/Cognio-so/AI_computer_brain     # or: pipx install git+https://github.com/Cognio-so/AI_computer_brain
+brain
+```
+
+Once the package is on PyPI, `ai-computer-brain` works in place of the URL. Either way `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one, on a laptop or a VPS.
+
+From source, for development: `git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain && ./start.sh` (Windows: `start.cmd`). The script creates the environment, installs, and opens the console. `scripts/install.sh docker` sets up the Docker stack instead.
 
 **First run.** `brain` asks for a colour theme, where the brain runs (this computer, a VPS, or this computer on your own domain through Cloudflare), whether to keep it running in the background, and creates your first project and key. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
 
