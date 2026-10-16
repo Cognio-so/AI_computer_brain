@@ -1,23 +1,65 @@
-# AI Computer Brain
+<p align="center"><img src="docs/assets/banner.svg" alt="AI Computer Brain" width="100%"></p>
 
-**The shared memory that keeps every AI agent in your company in sync.**
+<h1 align="center">AI Computer Brain</h1>
 
-A self-hosted, open-source [MCP](https://modelcontextprotocol.io) server. Install it once on a VPS or your PC, create a project, hand each agent a key. From then on every agent that belongs to that project, wherever it runs, reads and writes the same six living Markdown files and learns about every change on its next turn for a few dozen tokens.
+<p align="center"><b>The shared memory that keeps every AI agent in your company in sync.</b></p>
+
+<p align="center">
+  <a href="#quick-install">Install</a> &middot;
+  <a href="#the-terminal-console">Console</a> &middot;
+  <a href="#user-guide">User guide</a> &middot;
+  <a href="#connect-your-agents">Connect agents</a> &middot;
+  <a href="docs/">Docs</a>
+</p>
+
+<p align="center">
+  <img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-3776ab">
+  <img alt="MCP server" src="https://img.shields.io/badge/protocol-MCP-6f42c1">
+  <img alt="Powered by Cognio Labs" src="https://img.shields.io/badge/powered%20by-Cognio%20Labs-38bdf8">
+</p>
+
+A self-hosted, open-source [MCP](https://modelcontextprotocol.io) server. Install it once on your PC or a VPS, create a project, hand each agent a key. From then on every agent that belongs to that project, wherever it runs, reads and writes the same living Markdown files and learns about every change on its next turn for a few dozen tokens.
 
 Works with Hermes, OpenClaw, Claude Code, Cursor, custom Python agents, Slack or Discord bots, workflow tools, and anything else that can speak MCP or plain HTTPS. No LLM key is needed on the server. Agents bring their own model.
 
-## Quick start
+<table>
+<tr><td><b>Terminal console</b></td><td><code>brain</code> opens a Hermes-style shell: pixel logo, slash commands, arrow-key menus, your shell commands still work inside it.</td></tr>
+<tr><td><b>One brain, many agents</b></td><td>Every agent gets its own key and sees the same project. Hermes, OpenClaw, Claude Code, Cursor, Python, curl.</td></tr>
+<tr><td><b>Token-cheap sync</b></td><td>Seven living Markdown files with heading-level etags. Agents read only what changed and log what they did.</td></tr>
+<tr><td><b>Keys are identities</b></td><td><code>sb_&lt;project&gt;_&lt;role&gt;_&lt;agent&gt;_&lt;secret&gt;</code>, role-based permissions, approvals for sensitive sections.</td></tr>
+<tr><td><b>Knowledge base</b></td><td>Upload PDFs, docs and sheets, share them per agent or role; with an LLM they get summaries and topics.</td></tr>
+<tr><td><b>Fills itself</b></td><td>Connect the company repository and an LLM: the brain reads the code and writes the design system, stack, schema and pulse.</td></tr>
+<tr><td><b>Own domain in one command</b></td><td><code>/domain brain.yourcompany.com</code> puts it on your domain from a laptop through Cloudflare, or on a VPS with HTTPS.</td></tr>
+<tr><td><b>Always on</b></td><td><code>brain service install</code> keeps it running at login or boot, like <code>hermes gateway install</code>; every change is backed up to a private GitHub repository.</td></tr>
+</table>
+
+## Quick install
 
 ```bash
-git clone https://github.com/ai-computer-brain/ai-computer-brain && cd ai-computer-brain
-./start.sh        # Windows: start.cmd
+pipx install ai-computer-brain        # or: uv tool install ai-computer-brain
+brain                                 # first run: a short setup, then the console
 ```
 
-1. The first run asks for a colour theme, where the brain runs (this computer, a VPS, or this computer on your own domain through Cloudflare), whether to keep it running in the background, and creates your first project and key.
-2. Paste the printed command into your agent (Claude Code, Hermes, OpenClaw, Cursor, Python, curl). The agent receives its rules through the connection itself.
-3. In the console: `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
+No clone needed, on a laptop or a VPS. `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one. Until the package is on PyPI, install it straight from GitHub:
 
-The rest of this page is the full guide: [install](#install), [the console](#the-terminal-console), [user guide](#user-guide), [connecting agents](#connect-your-agents), [configuration](#configuration) and the [CLI](#cli).
+```bash
+pipx install git+https://github.com/Cognio-so/AI_computer_brain
+```
+
+One-liners that install the prerequisites too:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.sh | bash
+```
+
+```powershell
+iex (irm https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.ps1)
+```
+
+From source, for development: `git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain && ./start.sh` (Windows: `start.cmd`). The script creates the environment, installs, and opens the console.
+
+**First run.** `brain` asks for a colour theme, where the brain runs (this computer, a VPS, or this computer on your own domain through Cloudflare), whether to keep it running in the background, and creates your first project and key. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
 
 ---
 
@@ -47,27 +89,7 @@ Compaction is the server's job, so no single agent decides what stays: an entry 
 
 ---
 
-## Install
-
-### Clone and run, nothing else
-
-```bash
-git clone https://github.com/ai-computer-brain/ai-computer-brain
-cd ai-computer-brain
-./start.sh            # macOS and Linux
-start.cmd             # Windows, or double-click it in Explorer
-```
-
-The script creates the Python environment, installs the dependencies, generates the admin master key, starts the server, opens the admin panel in your browser already signed in, and leaves you in the terminal console described below. Run the same script again next time; it only installs on the first run.
-
-### With pipx or uv
-
-```bash
-pipx install ai-computer-brain        # or: uv tool install ai-computer-brain
-brain                                 # first run: a short setup, then the console
-```
-
-No clone needed, on a laptop or a VPS. Like Hermes with `~/.hermes`, `brain` keeps everything in one folder it creates on first run: `~/.brain` on Linux and macOS, `C:\Users\<you>\.brain` on Windows, holding `.env`, `data` and `brain_files`. Set `BRAIN_HOME=/srv/brain` before running it to choose another folder; running `brain` inside a folder that already holds a `.env`, such as a clone, uses that folder. Until the package is on PyPI, `pipx install git+https://github.com/ai-computer-brain/ai-computer-brain` installs it straight from GitHub.
+## Setup and deployment
 
 ### The terminal console
 
@@ -145,24 +167,12 @@ Like `hermes gateway install`, `/service install` in the console (or `brain serv
 ### VPS with HTTPS
 
 ```bash
-git clone https://github.com/ai-computer-brain/ai-computer-brain && cd ai-computer-brain
+git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain
 cp .env.example .env                  # set BRAIN_DOMAIN, PUBLIC_URL and ADMIN_MASTER_KEY
 docker compose up -d                  # Caddy fetches the certificate automatically
 ```
 
 Point a DNS `A` record for `brain.yourdomain.com` at the VPS first. The admin panel is at `https://brain.yourdomain.com/admin`. Step-by-step DNS, Cloudflare Tunnel and Cloudflare Access instructions are in [docs/cloudflare-domain.md](docs/cloudflare-domain.md).
-
-### One-liner
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/ai-computer-brain/ai-computer-brain/main/scripts/install.sh | bash
-```
-
-```powershell
-iex (irm https://raw.githubusercontent.com/ai-computer-brain/ai-computer-brain/main/scripts/install.ps1)
-```
-
-The Linux and macOS line uses Docker when available, otherwise pipx; the Windows line installs git if needed, clones the repository and runs `start.ps1`. Set `BRAIN_DOMAIN=brain.yourdomain.com` in the environment to get the HTTPS stack.
 
 ### Railway, Render, Fly.io
 
