@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$Repo = if ($env:BRAIN_REPO_URL) { $env:BRAIN_REPO_URL } else { "https://github.com/ai-computer-brain/ai-computer-brain" }
+$Repo = if ($env:BRAIN_REPO_URL) { $env:BRAIN_REPO_URL } else { "https://github.com/Cognio-so/AI_computer_brain" }
 $Dir = if ($env:BRAIN_INSTALL_DIR) { $env:BRAIN_INSTALL_DIR } else { Join-Path $HOME "ai-computer-brain" }
 
 function Say($message) { Write-Host "[brain] $message" -ForegroundColor Cyan }

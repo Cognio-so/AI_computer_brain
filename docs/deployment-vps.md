@@ -18,7 +18,7 @@ Create an `A` record `brain.yourdomain.com` pointing at the VPS public IP. With 
 ## 3. Configure and start
 
 ```bash
-git clone https://github.com/ai-computer-brain/ai-computer-brain && cd ai-computer-brain
+git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain
 cp .env.example .env
 ```
 

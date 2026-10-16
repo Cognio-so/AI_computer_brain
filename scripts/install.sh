@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="${BRAIN_REPO_URL:-https://github.com/ai-computer-brain/ai-computer-brain}"
+REPO_URL="${BRAIN_REPO_URL:-https://github.com/Cognio-so/AI_computer_brain}"
 INSTALL_DIR="${BRAIN_INSTALL_DIR:-$HOME/ai-computer-brain}"
 MODE="${1:-auto}"
 
