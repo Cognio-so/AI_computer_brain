@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/assets/banner.svg" alt="AI Computer Brain" width="100%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/docs/assets/banner.svg" alt="AI Computer Brain" width="100%"></p>
 
 <h1 align="center">AI Computer Brain</h1>
 
@@ -53,11 +53,11 @@ That is the whole install. The one-liner installs `uv` (the Python manager) if i
 Already have `uv` or `pipx`? Then one command does the same:
 
 ```bash
-uv tool install git+https://github.com/Cognio-so/AI_computer_brain     # or: pipx install git+https://github.com/Cognio-so/AI_computer_brain
+pip install ai-computer-brain        # or: pipx install ai-computer-brain, or: uv tool install ai-computer-brain
 brain
 ```
 
-Once the package is on PyPI, `ai-computer-brain` works in place of the URL. Either way `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one, on a laptop or a VPS.
+Node users can take the launcher from npm instead: `npm install -g ai-computer-brain` then `brain`, or `npx ai-computer-brain`; it installs `uv` and the Python package for you. The package is on PyPI as `ai-computer-brain`. Either way `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one, on a laptop or a VPS.
 
 From source, for development: `git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain && ./start.sh` (Windows: `start.cmd`). The script creates the environment, installs, and opens the console. `scripts/install.sh docker` sets up the Docker stack instead.
 
