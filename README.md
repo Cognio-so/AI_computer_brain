@@ -427,6 +427,10 @@ Everything the console does is also a plain command, for scripts and headless se
 | `brain db-watch --dsn <url> --project <id> --key <sb_...>` | Keep `DB_SCHEMA_STATE.md` current from a live database |
 | `brain doctor` | Checks git, cloudflared, the background service, templates, database and public URL |
 
+## Releasing
+
+Pushes and pull requests run the test suite on GitHub Actions. A push to `main` whose `version` in `pyproject.toml` is not on PyPI yet is published automatically through PyPI trusted publishing, so a release is: raise the version, merge to `main`. Users then get it with `pip install -U ai-computer-brain` or `uv tool upgrade ai-computer-brain`.
+
 ## Development
 
 ```bash
