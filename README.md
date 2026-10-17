@@ -50,7 +50,7 @@ brain
 
 That is the whole install, on a laptop or a VPS. `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one. Node users can run `npx ai-computer-brain` instead; it installs the same package.
 
-**First run.** `brain` asks for a colour theme and a port, creates your first project and key, and asks whether to keep the brain running in the background. The same steps apply on a laptop and on a VPS; a domain comes later with `/domain`. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
+**First run.** `brain` asks for a colour theme, creates your first project and key, and asks whether to keep the brain running in the background. It picks port 8000, or the next free one, by itself. The same steps apply on a laptop and on a VPS; a domain comes later with `/domain`. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
 
 ---
 
@@ -131,7 +131,7 @@ Everything is a slash command, and anything without a slash runs in your shell (
 
 Lists are navigated with the arrow keys (PageUp, PageDown, Home, End, type to filter long lists) and Enter; Esc goes back. On a terminal without key support the same menus fall back to numbers.
 
-The first run asks you to pick a colour theme (Ocean, Ember, Forest, Violet, Sunset, Mint, Gold or Mono, shown as live swatches) and a port, whether to create the first project right away, and whether to run the brain in the background from now on. It is the same on a laptop and on a VPS: the machine the brain runs on is just a computer, and `/domain` gives it a public name later. Everything the console does is also in the admin panel, and `brain serve` runs the plain server for Docker or systemd with the same logo, a status box and quiet logs (`--verbose` for request logs).
+The first run asks you to pick a colour theme (Ocean, Ember, Forest, Violet, Sunset, Mint, Gold or Mono, shown as live swatches), whether to create the first project right away, and whether to run the brain in the background from now on; the port is 8000 or the next free one. It is the same on a laptop and on a VPS: the machine the brain runs on is just a computer, and `/domain` gives it a public name later. Everything the console does is also in the admin panel, and `brain serve` runs the plain server for Docker or systemd with the same logo, a status box and quiet logs (`--verbose` for request logs).
 
 Need remote agents to reach your PC? `/tunnel` in the console, or `brain serve --tunnel`, opens a Cloudflare quick tunnel and prints a public HTTPS URL (requires `cloudflared`).
 
@@ -224,7 +224,7 @@ brain key quick "Claude Code laptop"
 
 ### Updating
 
-The console checks PyPI now and then and says when a newer release exists: in the status box, once at the prompt, as a chip in the admin panel header, and in the `brain serve` log. `/update` in the console, or `brain update`, upgrades the installed package the way it was installed (uv, pipx, pip, or `git pull` for a source checkout) and restarts the background service. Docker users rebuild with `docker compose up -d --build`.
+When you start `brain` and a newer release exists on PyPI, it asks 'Update now?' first, upgrades, and starts the new version, the way Codex and Claude Code do; a running background service is restarted onto the new version by the console. The status box, the prompt, the admin panel header and the `brain serve` log also say when a newer release exists. `/update` in the console, or `brain update`, upgrades the installed package the way it was installed (uv, pipx, pip, or `git pull` for a source checkout) and restarts the background service. Docker users rebuild with `docker compose up -d --build`.
 
 Schema changes apply themselves; brain files and documents are untouched. The console warns when the code on disk is newer than the running console: `/quit` and start it again.
 

@@ -329,14 +329,13 @@ async def test_document_store_and_agent_visibility(tmp_path):
         await service.documents.delete(project, shared.doc_id)
         assert not (service.documents.folder(project) / shared.file_name).exists()
         assert len(await service.documents.list(project)) == 1
-        quick = await service.quick_project("Acme Corp")
-        assert (
-            quick["project"]["project_id"] == "acme-corp-02"
-            and quick["agent_id"] == "primary-agent"
+        quick = await service.quick_project("Acme Corp", "Ops desk")
+        assert quick["project"]["project_id"] == "acme-corp-02" and quick["agent_id"] == "ops-desk"
+        assert quick["role"] == "ops" and quick["plaintext"].startswith(
+            "sb_acme-corp-02_ops_ops-desk_"
         )
-        assert quick["role"] == "admin" and quick["plaintext"].startswith(
-            "sb_acme-corp-02_admin_primary-agent_"
-        )
+        bare = await service.quick_project("Acme Corp")
+        assert bare["project"]["project_id"] == "acme-corp-03" and bare["key"] is None
     finally:
         await service.stop()
         await service.db.close()

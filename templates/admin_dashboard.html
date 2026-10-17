@@ -244,7 +244,7 @@ pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-stro
         <h1>Create your first project</h1>
         <p class="muted">One project per company or client. The brain creates the project ID, the first API key and the MCP connection for your agent from the name alone.</p>
         <form class="stack" @submit.prevent="createProject()">
-          <label class="field"><span>Company or project name</span><input x-model="newProject.name" placeholder="Acme Corp" required autofocus></label>
+          <label class="field"><span>Company or project name</span><input x-model="newProject.name" required autofocus></label>
           <div class="row"><button class="btn btn-primary" :disabled="busy">Create project</button><button type="button" class="btn btn-ghost" @click="openNewProject()">More options: repository, GitHub backup</button></div>
         </form>
       </div>
@@ -789,7 +789,7 @@ pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-stro
             <form class="card card-pad grid-2" @submit.prevent="saveSettings()">
               <label class="field"><span>Display name</span><input x-model="settingsForm.project_name"></label>
               <label class="field"><span>Vault branch</span><input x-model="settingsForm.git_branch" class="mono"></label>
-              <label class="field" style="grid-column:1/-1"><span>Vault Git remote (optional backup of the brain files)</span><input x-model="settingsForm.git_remote_url" placeholder="https://TOKEN@github.com/org/acme-brain.git" class="mono"><span class="hint">Every change is pushed there. Currently: <span class="mono" x-text="current.git_remote_url || 'none'"></span></span></label>
+              <label class="field" style="grid-column:1/-1"><span>Vault Git remote (optional backup of the brain files)</span><input x-model="settingsForm.git_remote_url" placeholder="https://TOKEN@github.com/<org>/<repo>.git" class="mono"><span class="hint">Every change is pushed there. Currently: <span class="mono" x-text="current.git_remote_url || 'none'"></span></span></label>
               <div style="grid-column:1/-1"><button type="submit" class="btn btn-primary" :disabled="busy">Save settings</button></div>
             </form>
             <div class="card card-pad stack">
@@ -818,8 +818,9 @@ pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-stro
   <form class="modal" @submit.prevent="createProject()">
     <div class="card-head"><h2>New project</h2><button type="button" class="btn btn-ghost btn-sm" @click="newProjectOpen = false">close</button></div>
     <div class="card-pad stack">
-      <p class="muted">The project ID, the first API key and the MCP connection are generated from the name.</p>
-      <label class="field"><span>Company or project name</span><input x-model="newProject.name" placeholder="Acme Corp" required x-ref="newProjectInput"></label>
+      <p class="muted">The project ID and the MCP connection are generated from the name. Name the first agent to get its key right away, or add agents later.</p>
+      <label class="field"><span>Company or project name</span><input x-model="newProject.name" required x-ref="newProjectInput"></label>
+      <label class="field"><span>First agent (optional)</span><input x-model="newProject.first_agent" placeholder="Job or name of the agent that gets the first key"><span class="hint">Leave empty to add agents later from the Agents page.</span></label>
       <label class="field"><span>Company GitHub repository (optional)</span><input x-model="newProject.repo_url" placeholder="https://github.com/org/repo" class="mono"><span class="hint">Pushes land in the company log; with an LLM the brain reads the code and fills itself.</span></label>
       <div class="card card-pad stack" style="background:var(--surface-2);gap:8px">
         <label class="switch"><input type="checkbox" x-model="newProject.backup"> <span>Create a private backup repository <span class="mono" x-text="slugPreview(newProject.name) + '_brain'"></span> on GitHub<span x-show="githubAccount.connected" x-text="' (' + githubAccount.owner + ')'"></span> and push every change there</span></label>
@@ -848,7 +849,7 @@ pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-stro
     <div class="card-head"><h2>Add an agent</h2><button type="button" class="btn btn-ghost btn-sm" @click="addAgentOpen = false">close</button></div>
     <div class="card-pad stack">
       <p class="muted">Creates the API key for one agent. You get the key and the exact command to paste into that agent; the key identifies the agent on every call and stays viewable on the Overview.</p>
-      <label class="field"><span>What is this agent?</span><input x-model="agentForm.name" placeholder="Sales Hermes on VPS 1" required x-ref="agentInput"><span class="hint">Name it after its job. "Sales", "marketing", "engineering", "ops" or "design" in the name picks the role; anything else gets admin.</span></label>
+      <label class="field"><span>What is this agent?</span><input x-model="agentForm.name" placeholder="Job or name of the agent" required x-ref="agentInput"><span class="hint">Name it after its job. "Sales", "marketing", "engineering", "ops" or "design" in the name picks the role; anything else gets admin.</span></label>
       <details class="small"><summary class="muted" style="cursor:pointer">Choose the role yourself</summary>
         <select x-model="agentForm.role" style="margin-top:8px"><option value="">auto from the name</option><template x-for="r in roles" :key="r"><option :value="r" x-text="r"></option></template></select></details>
       <button type="submit" class="btn btn-primary" :disabled="busy" style="align-self:flex-start">Create API key</button>
@@ -882,7 +883,7 @@ function brainAdmin() {
     ],
     keys: [], roles: [], sessions: [], issued: null, snippet: 'claude_code', pendingRevoke: null, pendingReissue: null, connectAgent: '', connect: null, showKey: false,
     snippetNames: ['claude_code', 'hermes', 'openclaw', 'mcp_json', 'python', 'events_curl'],
-    newProjectOpen: false, newProject: {name: '', repo_url: '', backup: true, token: ''}, addAgentOpen: false, agentForm: {name: '', role: ''},
+    newProjectOpen: false, newProject: {name: '', first_agent: '', repo_url: '', backup: true, token: ''}, addAgentOpen: false, agentForm: {name: '', role: ''},
     githubAccount: {connected: false, owner: '', token_hint: ''}, githubTokenInput: '', deleteOpen: false, deleteStep: 1, deleteBackupToo: false,
     oauth: null, oauthFlow: null, oauthCode: '', oauthWaiting: false, showSource: false, geminiProject: '',
     files: [], activeFile: null, fileDoc: null, fileMode: 'view', editor: {content: '', summary: '', etag: '', heading: '', slug: ''}, conflict: null,
@@ -1044,18 +1045,23 @@ function brainAdmin() {
         if (!ok) return;
         this.newProject.token = '';
       }
-      const body = {name, repo_url: (this.newProject.repo_url || '').trim() || null, backup: !!(this.newProject.backup && this.githubAccount.connected)};
+      const body = {name, first_agent: (this.newProject.first_agent || '').trim() || null, repo_url: (this.newProject.repo_url || '').trim() || null, backup: !!(this.newProject.backup && this.githubAccount.connected)};
       this.busy = true;
       try {
         const result = await this.api('POST', '/projects/quick', body);
-        this.newProject = {name: '', repo_url: '', backup: true, token: ''}; this.newProjectOpen = false;
+        this.newProject = {name: '', first_agent: '', repo_url: '', backup: true, token: ''}; this.newProjectOpen = false;
         await this.loadProjects();
         const project = this.projects.find(p => p.project_id === result.project.project_id);
         this.page = 'overview';
         await this.selectProject(project || result.project);
-        result.justCreated = true;
-        this.issued = result; this.snippet = 'claude_code';
-        this.toast('project ' + result.project.project_id + ' created with its first API key');
+        if (result.key) {
+          result.justCreated = true;
+          this.issued = result; this.snippet = 'claude_code';
+          this.toast('project ' + result.project.project_id + ' created with its first API key');
+        } else {
+          this.issued = null;
+          this.toast('project ' + result.project.project_id + ' created; Add agent creates its first key');
+        }
         if (result.backup_error) this.toast('backup repository: ' + result.backup_error, 'error');
       } catch (e) { this.toast(e.message, 'error'); } finally { this.busy = false; }
     },

@@ -422,12 +422,15 @@ def test_admin_client_used_by_the_shell(server):
 
 def test_quick_project_documents_llm_and_github_endpoints(server):
     with admin(server) as client:
-        created = client.post("/api/admin/projects/quick", json={"name": "Northwind Traders"})
+        created = client.post(
+            "/api/admin/projects/quick",
+            json={"name": "Northwind Traders", "first_agent": "Sales desk"},
+        )
         assert created.status_code == 201, created.text
         body = created.json()
         pid = body["project"]["project_id"]
-        assert pid == "northwind-traders" and body["agent_id"] == "primary-agent"
-        assert body["plaintext"].startswith(f"sb_{pid}_admin_primary-agent_")
+        assert pid == "northwind-traders" and body["agent_id"] == "sales-desk"
+        assert body["plaintext"].startswith(f"sb_{pid}_sales_sales-desk_")
         assert "claude mcp add" in body["command"] and body["project"]["key_count"] == 1
         again = client.post("/api/admin/projects/quick", json={"name": "Northwind Traders"})
         assert again.json()["project"]["project_id"] == "northwind-traders-02"
@@ -455,11 +458,11 @@ def test_quick_project_documents_llm_and_github_endpoints(server):
                     "text/markdown",
                 )
             },
-            data={"title": "Sales playbook", "access": "primary-agent"},
+            data={"title": "Sales playbook", "access": "sales-desk"},
         )
         assert doc.status_code == 201, doc.text
         doc_id = doc.json()["doc_id"]
-        assert doc.json()["access"] == ["primary-agent"] and doc.json()["text_chars"] > 10
+        assert doc.json()["access"] == ["sales-desk"] and doc.json()["text_chars"] > 10
         listed = client.get(f"/api/admin/projects/{pid}/documents").json()
         assert [d["doc_id"] for d in listed] == [doc_id]
         detail = client.get(f"/api/admin/projects/{pid}/documents/{doc_id}").json()

@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import threading
@@ -79,6 +80,8 @@ def main(
     ),
 ) -> None:
     enter_home()
+    if ctx.invoked_subcommand in (None, "shell"):
+        offer_update()
     if ctx.invoked_subcommand is None:
         if interactive():
             shell(False)
@@ -95,13 +98,15 @@ def shell(
     from .tui import run_shell
 
     settings = get_settings()
+    logo = True
     if not settings.admin_master_key:
         if interactive():
             setup_wizard(Path.cwd(), settings.brain_port, ask_browser=False)
+            logo = False
         else:
             ensure_env(Path.cwd(), f"http://localhost:{settings.brain_port}")
         reset_settings_cache()
-    run_shell(open_browser=open_browser)
+    run_shell(open_browser=open_browser, logo=logo)
 
 
 @app.command()
@@ -210,6 +215,43 @@ def print_key(result: dict[str, Any]) -> None:
     typer.echo("\nThe key is shown once here and again in the admin panel when you create more.")
 
 
+def offer_update() -> None:
+    if not interactive():
+        return
+    info = updates.check(Path.cwd() / "data")
+    if not info.get("newer"):
+        return
+    typer.secho(
+        f"\nA new version of AI Computer Brain is available: {info['latest']} (this is v{__version__}).",
+        fg=typer.colors.YELLOW,
+        bold=True,
+    )
+    if not typer.confirm("Update now?", default=True):
+        typer.echo("Skipped. /update in the console installs it later.")
+        return
+    method = updates.install_method()
+    typer.echo(f"updating with: {' '.join(updates.upgrade_command(method))}")
+    ok, output, _ = updates.run_upgrade(method)
+    if not ok:
+        typer.secho(f"update failed: {output[-400:]}", fg=typer.colors.RED, err=True)
+        typer.echo("Continuing with the current version.")
+        return
+    typer.secho(f"updated to {info['latest']}; starting the new version", fg=typer.colors.GREEN)
+    code = subprocess.call([sys.executable, "-m", "second_brain.cli", *sys.argv[1:]])
+    raise typer.Exit(code=code)
+
+
+def free_port(preferred: int) -> int:
+    for candidate in range(preferred, preferred + 20):
+        with socket.socket() as sock:
+            try:
+                sock.bind(("127.0.0.1", candidate))
+            except OSError:
+                continue
+            return candidate
+    return preferred
+
+
 def setup_wizard(directory: Path, default_port: int, ask_browser: bool = True) -> bool:
     from . import tui
 
@@ -217,16 +259,18 @@ def setup_wizard(directory: Path, default_port: int, ask_browser: bool = True) -
     typer.secho("\nAI Computer Brain: first-time setup", fg=typer.colors.CYAN, bold=True)
     typer.echo("A few questions. Everything can be changed later in .env or the admin panel.")
     theme = choose_theme_and_show()
-    typer.echo("")
-    port = typer.prompt("Port for the brain on this computer", default=default_port, type=int)
+    port = free_port(default_port)
+    if port != default_port:
+        typer.echo(f"port {default_port} is in use on this computer; the brain uses {port} instead")
     master_key = write_env(directory, f"http://localhost:{port}", port=port, theme=theme)
     reset_settings_cache()
-    typer.secho(f"\nSaved .env with a new master key: {master_key}", fg=typer.colors.GREEN)
-    typer.echo(f"Folder: {directory}  (.env, data and brain_files live here)")
-    typer.echo("It unlocks the admin panel and is stored in .env.\n")
+    typer.secho(f"\nMaster key: {master_key}", fg=typer.colors.GREEN)
+    typer.echo("It signs you in to the admin panel; it is saved in .env, /master shows it again.")
+    typer.echo(f"Admin panel: http://127.0.0.1:{port}{get_settings().admin_path}")
+    typer.echo(f"Folder: {directory}\n")
     if typer.confirm("Create your first project and API key now?", default=True):
         company = typer.prompt("Company or project name")
-        purpose = typer.prompt("What is the first key for", default="Claude Code laptop")
+        purpose = typer.prompt("Which agent will use the first key (its job or name)")
         try:
             print_key(_run(lambda service: service.quick_key(purpose, None, company, None)))
         except Exception as error:
@@ -458,7 +502,9 @@ def _start_tunnel(port: int, named: str = "", domain: str = "") -> subprocess.Po
 
 @project_app.command("create")
 def project_create(
-    project_id: str = typer.Argument(..., help="Lowercase identifier such as acme-corp."),
+    project_id: str = typer.Argument(
+        ..., help="Lowercase identifier: letters, digits and hyphens."
+    ),
     name: str = typer.Option("", "--name", help="Display name."),
     git_remote: str | None = typer.Option(
         None, "--git-remote", help="Optional remote to push the vault to."
@@ -507,7 +553,7 @@ def key_create(
     role: str = typer.Option(
         ..., "--role", help="Department role defined in ACCESS_PERMISSIONS.md."
     ),
-    agent: str = typer.Option(..., "--agent", help="Agent ID such as hermes-sales-01."),
+    agent: str = typer.Option(..., "--agent", help="Agent ID: letters, digits and hyphens."),
     label: str | None = typer.Option(None, "--label", help="Free-text label."),
     snippets: bool = typer.Option(False, "--snippets", help="Print connection snippets."),
 ) -> None:
@@ -532,7 +578,7 @@ def key_create(
 
 @key_app.command("quick")
 def key_quick(
-    name: str = typer.Argument(..., help="What the key is for, e.g. 'Sales Hermes on VPS 1'."),
+    name: str = typer.Argument(..., help="The agent that will use the key, by job or name."),
     project: str | None = typer.Option(
         None,
         "--project",
