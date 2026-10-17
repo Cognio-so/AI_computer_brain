@@ -225,7 +225,7 @@ class BrainService:
             raise BrainError(
                 400,
                 "INVALID",
-                "project_id must be 3-40 characters of a-z, 0-9 and hyphens, starting and ending with a letter or digit, for example acme-corp",
+                "project_id must be 3-40 characters of a-z, 0-9 and hyphens, starting and ending with a letter or digit",
             )
         if await self.project_exists(project_id):
             raise BrainError(409, "CONFLICT", f"project {project_id!r} already exists")
@@ -1825,9 +1825,7 @@ class BrainService:
     ) -> dict[str, Any]:
         label = " ".join((name or "").split())
         if not label:
-            raise BrainError(
-                400, "INVALID", "name is required, for example 'Sales Hermes on VPS 1'"
-            )
+            raise BrainError(400, "INVALID", "name is required")
         project = await self._project_for_quick_key(project_id, project_name, label)
         roles = await self.roles(project)
         chosen = (role or "").strip().casefold() or detect_role(label, roles)
@@ -1876,7 +1874,20 @@ class BrainService:
             candidate = f"{base[:37].rstrip('-')}-{counter:02d}"
             counter += 1
         project = await self.create_project(candidate, label)
-        result = await self.quick_key(first_agent or "Primary agent", candidate)
+        agent = (first_agent or "").strip()
+        if agent:
+            result = await self.quick_key(agent, candidate)
+        else:
+            result = {
+                "project": self.project_view(project),
+                "key": None,
+                "plaintext": None,
+                "role": None,
+                "agent_id": None,
+                "mcp_url": f"{self.settings.public_url}/mcp",
+                "command": None,
+                "snippets": None,
+            }
         result["github"] = None
         result["github_error"] = None
         if repo_url and repo_url.strip():

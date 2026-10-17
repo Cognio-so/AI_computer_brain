@@ -915,7 +915,7 @@ class Shell:
         assert self.client is not None
         return self.client
 
-    def run(self) -> None:
+    def run(self, logo: bool = True) -> None:
         safe_stdio()
         if not self.settings.brain_theme:
             chosen = choose_theme()
@@ -925,13 +925,15 @@ class Shell:
             self.handle.settings = self.settings
         apply_theme(self.settings.brain_theme)
         threading.Thread(target=self.check_updates, name="brain-update-check", daemon=True).start()
-        print_logo(console, current.primary, current.accent, current.muted, __version__)
+        if logo:
+            print_logo(console, current.primary, current.accent, current.muted, __version__)
         if background.healthy(self.handle.local_url):
             self.attached = True
             console.print(
                 f"[muted]the brain is already running on port {self.handle.port} as a background "
                 "service; this console is attached to it[/muted]"
             )
+            self.refresh_stale_service()
         else:
             with console.status(
                 f"[muted]starting the server on port {self.handle.port}...[/muted]"
@@ -1387,6 +1389,9 @@ class Shell:
         if not name:
             return
         repo_url = prompt("Company GitHub repository URL (optional, Enter to skip)")
+        first_agent = prompt(
+            "Which agent gets the first key: its job or name (Enter to add agents later)"
+        )
         backup = False
         account = self.api.github_account()
         if not account["connected"]:
@@ -1405,9 +1410,17 @@ class Shell:
                 default=True,
             )
         with console.status("[muted]creating the project...[/muted]"):
-            result = self.api.quick_project(name, repo_url=repo_url or None, backup=backup)
-        self.show_key_result(result)
+            result = self.api.quick_project(
+                name, first_agent=first_agent or None, repo_url=repo_url or None, backup=backup
+            )
         self.project_id = result["project"]["project_id"]
+        if result.get("key"):
+            self.show_key_result(result)
+        else:
+            console.print(
+                f"[success]project {self.project_id} created[/success] [muted]/key adds the first "
+                "agent key when you are ready[/muted]"
+            )
         if result.get("github"):
             console.print(f"[success]repository {result['github']['repo_url']} connected[/success]")
             secret = result["github"].get("webhook_secret")
@@ -1435,7 +1448,7 @@ class Shell:
                 f"[warning]backup repository not created: {result['backup_error']}[/warning]"
             )
         while confirm("Add another key to this project now (one per agent)?", default=True):
-            purpose = prompt("What is the key for (e.g. Sales Hermes on VPS 1)")
+            purpose = prompt("Which agent will use this key (its job or name)")
             if not purpose:
                 break
             self.show_key_result(self.api.quick_key(purpose, project_id=self.project_id))
@@ -1529,7 +1542,7 @@ class Shell:
         if pid is None:
             return
         purpose = " ".join(positional).strip() or prompt(
-            "What is the key for (e.g. Marketing Hermes on VPS 2)"
+            "Which agent will use this key (its job or name)"
         )
         if purpose:
             self.show_key_result(self.api.quick_key(purpose, project_id=pid))
@@ -3291,6 +3304,26 @@ class Shell:
             self.reload()
             console.print("[success]restarted[/success]")
 
+    def service_version(self) -> str | None:
+        try:
+            data = httpx.get(f"{self.handle.local_url}/healthz", timeout=3).json()
+        except (httpx.HTTPError, ValueError):
+            return None
+        version = data.get("version") if isinstance(data, dict) else None
+        return str(version) if version else None
+
+    def refresh_stale_service(self) -> None:
+        running = self.service_version()
+        if not running or not updates.is_newer(__version__, running):
+            return
+        console.print(
+            f"[muted]the background service runs v{running}; restarting it on v{__version__}...[/muted]"
+        )
+        try:
+            background.restart(self.spec())
+        except background.ServiceError as error:
+            console.print(f"[warning]could not restart the service: {error}[/warning]")
+
     def check_updates(self) -> None:
         try:
             self.update = updates.check(self.env_path.parent / "data")
@@ -3534,6 +3567,6 @@ def human_size(size: int) -> str:
     return f"{size}B"
 
 
-def run_shell(open_browser: bool = False) -> None:
+def run_shell(open_browser: bool = False, logo: bool = True) -> None:
     settings = get_settings()
-    Shell(settings, Path.cwd() / ".env", open_browser=open_browser).run()
+    Shell(settings, Path.cwd() / ".env", open_browser=open_browser).run(logo=logo)

@@ -37,7 +37,8 @@ def test_setup_wizard_local_creates_env_project_and_key(tmp_path, monkeypatch):
     import second_brain.cli as cli
 
     monkeypatch.chdir(tmp_path)
-    answers = iter(["1", 8123, "Acme Corp", "Sales Hermes on VPS 1"])
+    answers = iter(["1", "Acme Corp", "Sales Hermes on VPS 1"])
+    monkeypatch.setattr(cli, "free_port", lambda preferred: preferred)
     monkeypatch.setattr(cli.typer, "prompt", lambda *a, **k: next(answers))
     monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: True)
     printed: list[dict] = []
@@ -52,11 +53,11 @@ def test_setup_wizard_local_creates_env_project_and_key(tmp_path, monkeypatch):
     finally:
         cli.reset_settings_cache()
     env = (tmp_path / ".env").read_text(encoding="utf-8")
-    assert "BRAIN_PORT=8123" in env and "PUBLIC_URL=http://localhost:8123" in env
+    assert "BRAIN_PORT=8000" in env and "PUBLIC_URL=http://localhost:8000" in env
     assert printed and printed[0]["project"]["project_id"] == "acme-corp"
-    assert printed[0]["role"] == "sales" and printed[0]["mcp_url"] == "http://localhost:8123/mcp"
+    assert printed[0]["role"] == "sales" and printed[0]["mcp_url"] == "http://localhost:8000/mcp"
     assert (tmp_path / "brain_files" / "acme-corp" / "AGENT_CHANGELOG.md").is_file()
-    assert installed == [8123]
+    assert installed == [8000]
 
 
 def test_service_commands_report_state(tmp_path, monkeypatch):
@@ -106,6 +107,33 @@ def test_brain_home_is_created_automatically(tmp_path, monkeypatch):
     result = runner.invoke(app, ["init"])
     assert result.exit_code == 0, result.output
     assert (tmp_path / "explicit" / ".env").is_file()
+
+
+def test_console_start_offers_the_update(tmp_path, monkeypatch, capsys):
+    import second_brain.cli as cli
+    from second_brain import updates
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(cli, "interactive", lambda: True)
+    monkeypatch.setattr(updates, "latest_version", lambda timeout=3.0: "99.0.0")
+    monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: True)
+    monkeypatch.setattr(updates, "run_upgrade", lambda method=None: (True, "", ["x"]))
+    launched: list[list[str]] = []
+    monkeypatch.setattr(cli.subprocess, "call", lambda args: launched.append(args) or 0)
+    try:
+        cli.offer_update()
+        raised = False
+    except cli.typer.Exit:
+        raised = True
+    assert raised and launched and launched[0][1:3] == ["-m", "second_brain.cli"]
+    assert "A new version" in capsys.readouterr().out
+    monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: False)
+    cli.offer_update()
+    assert "Skipped" in capsys.readouterr().out
+    monkeypatch.setattr(updates, "latest_version", lambda timeout=3.0: updates.__version__)
+    (tmp_path / "data" / "update-check.json").unlink(missing_ok=True)
+    cli.offer_update()
+    assert capsys.readouterr().out == ""
 
 
 def test_update_command_reports_newest_release(tmp_path, monkeypatch):

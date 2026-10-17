@@ -203,7 +203,7 @@ class Authenticator:
         if not is_identifier(agent_id):
             raise AuthError(
                 400,
-                "agent_id must be 3-40 characters of a-z, 0-9 and hyphens, starting and ending with a letter or digit, for example hermes-sales-01",
+                "agent_id must be 3-40 characters of a-z, 0-9 and hyphens, starting and ending with a letter or digit",
             )
         if not is_identifier(role):
             raise AuthError(
