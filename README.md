@@ -36,32 +36,21 @@ Works with Hermes, OpenClaw, Claude Code, Cursor, custom Python agents, Slack or
 
 ## Quick install
 
-Linux, macOS and WSL:
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.sh | bash
-```
-
-Windows PowerShell:
-
-```powershell
-iex (irm https://raw.githubusercontent.com/Cognio-so/AI_computer_brain/main/scripts/install.ps1)
-```
-
-That is the whole install. The one-liner installs `uv` (the Python manager) if it is missing, downloads Python 3.12 if needed, installs the brain as a tool and starts the console. No clone, no pipx, nothing to install first. Next time, type `brain`.
-
-Already have `uv` or `pipx`? Then one command does the same:
-
-```bash
-pip install ai-computer-brain        # or: pipx install ai-computer-brain, or: uv tool install ai-computer-brain
+pip install ai-computer-brain
 brain
 ```
 
-Node users can take the launcher from npm instead: `npm install -g ai-computer-brain` then `brain`, or `npx ai-computer-brain`; it installs `uv` and the Python package for you. The package is on PyPI as `ai-computer-brain`. Either way `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one, on a laptop or a VPS.
+Or with [uv](https://docs.astral.sh/uv/), which also fetches Python if the machine has none:
 
-From source, for development: `git clone https://github.com/Cognio-so/AI_computer_brain && cd AI_computer_brain && ./start.sh` (Windows: `start.cmd`). The script creates the environment, installs, and opens the console. `scripts/install.sh docker` sets up the Docker stack instead.
+```bash
+uv tool install ai-computer-brain
+brain
+```
 
-**First run.** `brain` asks for a colour theme, where the brain runs (this computer, a VPS, or this computer on your own domain through Cloudflare), whether to keep it running in the background, and creates your first project and key. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
+That is the whole install, on a laptop or a VPS. `brain` keeps everything in one folder it creates on first run, `~/.brain` (`C:\Users\<you>\.brain` on Windows), with `.env`, `data` and `brain_files` inside; set `BRAIN_HOME` to choose another one. Node users can run `npx ai-computer-brain` instead; it installs the same package.
+
+**First run.** `brain` asks for a colour theme and a port, creates your first project and key, and asks whether to keep the brain running in the background. The same steps apply on a laptop and on a VPS; a domain comes later with `/domain`. Paste the printed command into your agent. Then `/new` and `/key` for more projects and agents, `/docs add` for the documents they must know, `/github` and `/llm` so the brain fills itself from your code, `/domain brain.yourcompany.com` to reach it from anywhere.
 
 ---
 
@@ -142,7 +131,7 @@ Everything is a slash command, and anything without a slash runs in your shell (
 
 Lists are navigated with the arrow keys (PageUp, PageDown, Home, End, type to filter long lists) and Enter; Esc goes back. On a terminal without key support the same menus fall back to numbers.
 
-The first run asks you to pick a colour theme (Ocean, Ember, Forest, Violet, Sunset, Mint, Gold or Mono, shown as live swatches), where the server will live (this computer; a VPS with a domain; or this computer on your own domain through Cloudflare), whether to run the brain in the background from now on, and whether to create the first project right away. Everything the console does is also in the admin panel, and `brain serve` runs the plain server for Docker or systemd with the same logo, a status box and quiet logs (`--verbose` for request logs).
+The first run asks you to pick a colour theme (Ocean, Ember, Forest, Violet, Sunset, Mint, Gold or Mono, shown as live swatches) and a port, whether to create the first project right away, and whether to run the brain in the background from now on. It is the same on a laptop and on a VPS: the machine the brain runs on is just a computer, and `/domain` gives it a public name later. Everything the console does is also in the admin panel, and `brain serve` runs the plain server for Docker or systemd with the same logo, a status box and quiet logs (`--verbose` for request logs).
 
 Need remote agents to reach your PC? `/tunnel` in the console, or `brain serve --tunnel`, opens a Cloudflare quick tunnel and prints a public HTTPS URL (requires `cloudflared`).
 
