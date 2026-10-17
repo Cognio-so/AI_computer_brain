@@ -224,10 +224,7 @@ brain key quick "Claude Code laptop"
 
 ### Updating
 
-```bash
-git pull
-brain service restart       # or /restart in the console; Docker: docker compose up -d --build
-```
+The console checks PyPI now and then and says when a newer release exists: in the status box, once at the prompt, as a chip in the admin panel header, and in the `brain serve` log. `/update` in the console, or `brain update`, upgrades the installed package the way it was installed (uv, pipx, pip, or `git pull` for a source checkout) and restarts the background service. Docker users rebuild with `docker compose up -d --build`.
 
 Schema changes apply themselves; brain files and documents are untouched. The console warns when the code on disk is newer than the running console: `/quit` and start it again.
 

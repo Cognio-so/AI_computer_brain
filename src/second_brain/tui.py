@@ -25,7 +25,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.theme import Theme
 
-from . import __version__, background, cloudflare
+from . import __version__, background, cloudflare, updates
 from .banner import print_logo
 from .config import (
     CANONICAL_FILES,
@@ -523,6 +523,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("set", "/set KEY value", "Change one setting and restart", "Server"),
     Command("edit", "/edit", "Open .env in your editor", "Server"),
     Command("restart", "/restart", "Restart the server", "Server"),
+    Command("update", "/update", "Upgrade to the newest release on PyPI", "Server"),
 )
 COMMAND_INDEX: dict[str, Command] = {}
 for _command in COMMANDS:
@@ -848,6 +849,8 @@ class Shell:
         self.code_warned = False
         self.cloudflared = cloudflare.installer(env_path.parent / "data" / "bin")
         self.attached = False
+        self.update: dict[str, object] | None = None
+        self.update_shown = False
         self.oauth_sign_in_result: dict[str, Any] = {}
         self.handlers: dict[str, Callable[[list[str]], None]] = {
             "help": self.cmd_help,
@@ -888,6 +891,7 @@ class Shell:
             "set": self.cmd_set,
             "edit": self.cmd_edit,
             "restart": self.cmd_restart,
+            "update": self.cmd_update,
         }
 
     @property
@@ -920,6 +924,7 @@ class Shell:
             self.settings = get_settings()
             self.handle.settings = self.settings
         apply_theme(self.settings.brain_theme)
+        threading.Thread(target=self.check_updates, name="brain-update-check", daemon=True).start()
         print_logo(console, current.primary, current.accent, current.muted, __version__)
         if background.healthy(self.handle.local_url):
             self.attached = True
@@ -970,6 +975,12 @@ class Shell:
             console.print(
                 "[warning]brain was updated on disk since this console started: type /quit and run "
                 "brain again to use the new version[/warning]"
+            )
+        if not self.update_shown and self.update and self.update.get("newer"):
+            self.update_shown = True
+            console.print(
+                f"[warning]version {self.update['latest']} is on PyPI (this is v{__version__}): "
+                "/update installs it[/warning]"
             )
         label = "[primary]brain[/primary]"
         if self.project_id:
@@ -1172,6 +1183,15 @@ class Shell:
             else "[muted]only while this console is open; /service keeps it running after you "
             "close it[/muted]",
         )
+        info = self.update or {}
+        if info.get("newer"):
+            self.update_shown = True
+            version_state = f"[warning]{info['latest']} is available: /update[/warning]"
+        elif info.get("latest"):
+            version_state = "[muted]newest release[/muted]"
+        else:
+            version_state = "[muted]/update checks PyPI[/muted]"
+        body.add_row("Version", f"v{__version__}   {version_state}")
         body.add_row(
             "Master key",
             f"{mask(self.settings.admin_master_key, 'ADMIN_MASTER_KEY')}   [muted]/master[/muted]",
@@ -3270,6 +3290,49 @@ class Shell:
         if confirm("Restart the server to apply changes?", default=True):
             self.reload()
             console.print("[success]restarted[/success]")
+
+    def check_updates(self) -> None:
+        try:
+            self.update = updates.check(self.env_path.parent / "data")
+        except Exception:
+            self.update = None
+
+    def cmd_update(self, args: list[str]) -> None:
+        with console.status("[muted]checking PyPI for the newest release...[/muted]"):
+            info = updates.check(self.env_path.parent / "data", force=True)
+        self.update = info
+        latest = info.get("latest")
+        if not latest:
+            console.print("[warning]could not reach PyPI to check for a new version[/warning]")
+            return
+        if not info.get("newer"):
+            console.print(f"[success]v{__version__} is the newest release[/success]")
+            return
+        method = updates.install_method()
+        command = " ".join(updates.upgrade_command(method))
+        body = grid()
+        body.add_row("Installed", f"v{__version__}  [muted](with {method})[/muted]")
+        body.add_row("Newest", f"[accent]{latest}[/accent]")
+        body.add_row("Command", command)
+        console.print(panel(body, "Update available"))
+        if not confirm(f"Upgrade to {latest} now?", default=True):
+            console.print("[muted]nothing changed[/muted]")
+            return
+        with console.status(f"[muted]upgrading to {latest}...[/muted]"):
+            ok, output, _ = updates.run_upgrade(method)
+        if not ok:
+            console.print(panel(Text(output or "no output"), "upgrade failed", style="danger"))
+            return
+        console.print(f"[success]upgraded to {latest}[/success]")
+        if self.attached:
+            with console.status("[muted]restarting the background service...[/muted]"):
+                background.restart(self.spec())
+            console.print(
+                "[muted]the background service now runs the new version; type /quit and run brain "
+                "again for this console[/muted]"
+            )
+        else:
+            console.print("[muted]type /quit and run brain again to use the new version[/muted]")
 
     def cmd_restart(self, args: list[str]) -> None:
         self.reload()

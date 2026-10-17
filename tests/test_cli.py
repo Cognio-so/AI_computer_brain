@@ -108,6 +108,19 @@ def test_brain_home_is_created_automatically(tmp_path, monkeypatch):
     assert (tmp_path / "explicit" / ".env").is_file()
 
 
+def test_update_command_reports_newest_release(tmp_path, monkeypatch):
+    from second_brain import updates
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(updates, "latest_version", lambda timeout=3.0: updates.__version__)
+    result = CliRunner().invoke(app, ["update"])
+    assert result.exit_code == 0 and "newest release" in result.output
+    monkeypatch.setattr(updates, "latest_version", lambda timeout=3.0: "99.0.0")
+    monkeypatch.setattr(updates, "run_upgrade", lambda method=None: (True, "ok", ["x"]))
+    result = CliRunner().invoke(app, ["update"])
+    assert result.exit_code == 0 and "upgraded to 99.0.0" in result.output
+
+
 def test_print_banner_renders(tmp_path, capsys):
     import second_brain.cli as cli
     from second_brain.config import Settings
