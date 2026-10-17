@@ -42,8 +42,9 @@ dependencies = [
 dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.5", "mypy>=1.10"]
 
 [project.urls]
-Homepage = "https://github.com/ai-computer-brain/ai-computer-brain"
-Documentation = "https://github.com/ai-computer-brain/ai-computer-brain/tree/main/docs"
+Homepage = "https://github.com/Cognio-so/AI_computer_brain"
+Repository = "https://github.com/Cognio-so/AI_computer_brain"
+Documentation = "https://github.com/Cognio-so/AI_computer_brain/tree/main/docs"
 
 [project.scripts]
 brain = "second_brain.cli:app"

@@ -14,3 +14,4 @@ brain_files/
 *.db
 *.db-journal
 .DS_Store
+npm/node_modules/

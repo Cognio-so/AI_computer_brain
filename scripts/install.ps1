@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$Package = if ($env:BRAIN_PACKAGE) { $env:BRAIN_PACKAGE } else { "git+https://github.com/Cognio-so/AI_computer_brain" }
+$Package = if ($env:BRAIN_PACKAGE) { $env:BRAIN_PACKAGE } else { "ai-computer-brain" }
 
 function Say($message) { Write-Host "[brain] $message" -ForegroundColor Cyan }
 
