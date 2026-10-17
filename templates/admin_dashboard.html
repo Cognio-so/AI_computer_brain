@@ -205,7 +205,7 @@ pre{margin:0;background:#0a0e13;color:#dde6ee;border:1px solid var(--border-stro
 
 <div x-show="authed" class="app">
   <header class="topbar">
-    <div class="brand"><span x-html="logoSvg(28)"></span><div><strong>AI Computer Brain</strong> <span class="small muted" x-show="status" x-text="status && ('v' + status.version)"></span></div></div>
+    <div class="brand"><span x-html="logoSvg(28)"></span><div><strong>AI Computer Brain</strong> <span class="small muted" x-show="status" x-text="status && ('v' + status.version)"></span> <a class="chip chip-warn" x-show="status && status.update && status.update.newer" :title="'Run /update in the console or brain update (' + (status && status.update ? status.update.latest : '') + ' is on PyPI)'" href="https://github.com/Cognio-so/AI_computer_brain#updating" target="_blank" rel="noopener" x-text="status && status.update && ('update ' + status.update.latest + ' available')"></a></div></div>
     <div class="row">
       <span class="chip" :class="status && status.llm && status.llm.enabled ? 'chip-ok' : ''" x-text="status && status.llm && status.llm.enabled ? ('LLM: ' + status.llm.provider_label) : 'LLM: off'"></span>
       <span class="chip" x-show="status" x-text="status && (status.database + (status.redis ? ' + redis' : ''))"></span>

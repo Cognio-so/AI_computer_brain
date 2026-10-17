@@ -5,6 +5,7 @@ import ipaddress
 import json
 import secrets
 from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Any
 
 from fastapi import (
@@ -28,7 +29,7 @@ from fastapi.responses import (
 )
 from pydantic import BaseModel, Field
 
-from . import __version__
+from . import __version__, updates
 from .anthropic_login import ant_binary, install_instructions, profile_status
 from .auth import ADMIN_ROLE, Principal, extract_token
 from .config import CANONICAL_FILES, Settings, update_env
@@ -156,6 +157,7 @@ async def status(service: BrainService = Depends(require_master)) -> dict[str, A
     return {
         "ok": True,
         "version": __version__,
+        "update": await asyncio.to_thread(updates.check, Path.cwd() / "data"),
         "public_url": service.settings.public_url,
         "projects": len(projects),
         "setup_required": not projects,

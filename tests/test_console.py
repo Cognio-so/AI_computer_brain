@@ -376,3 +376,28 @@ def test_agent_command_shows_connection_commands_again(tmp_path, capsys, monkeyp
     out = flat(capsys.readouterr().out)
     assert "Connect sales-hermes to the brain" in out and "https://brain.example.com/mcp" in out
     assert "<paste the agent key>" in out and "created before keys were kept" in out
+
+
+def test_status_box_announces_a_new_release(tmp_path, capsys, monkeypatch):
+    from second_brain.config import Settings
+
+    tui.apply_theme("mono")
+    monkeypatch.setattr(
+        tui,
+        "console",
+        Console(
+            width=120,
+            color_system=None,
+            legacy_windows=False,
+            theme=tui.rich_theme(tui.palette_for("mono")),
+        ),
+    )
+    shell = tui.Shell(Settings(_env_file=None, admin_master_key="bm_test"), tmp_path / ".env")
+    shell.client = tui.AdminClient(shell.handle.local_url, "bm_test")
+    shell.update = {"current": tui.__version__, "latest": "99.0.0", "newer": True}
+    shell.status_block()
+    assert "99.0.0 is available: /update" in flat(capsys.readouterr().out)
+    monkeypatch.setattr(tui, "read_input", lambda markup: "/quit")
+    shell.update_shown = False
+    assert shell.read_line() == "/quit"
+    assert "version 99.0.0 is on PyPI" in flat(capsys.readouterr().out)

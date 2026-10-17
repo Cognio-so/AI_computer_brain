@@ -19,7 +19,7 @@ from typing import Any, TypeVar
 import httpx
 import typer
 
-from . import __version__, background
+from . import __version__, background, updates
 from .config import enter_home, generate_master_key, get_settings, reset_settings_cache
 
 app = typer.Typer(
@@ -370,6 +370,13 @@ def serve(
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
     print_banner(settings, bind_port, _project_names(), verbose)
+    release = updates.check(Path.cwd() / "data")
+    if release.get("newer"):
+        typer.secho(
+            f"update: version {release['latest']} is on PyPI (this is v{__version__}); "
+            "run brain update",
+            fg=typer.colors.YELLOW,
+        )
     background.write_pid(Path.cwd())
     if open_browser:
         open_when_ready(bind_port, settings.admin_master_key, settings.admin_path)
@@ -725,6 +732,30 @@ def service_uninstall(system: bool = typer.Option(False, "--system")) -> None:
 def service_logs(lines: int = typer.Option(50, help="Number of lines to show.")) -> None:
     text = background.logs(_spec(), lines)
     typer.echo(text or f"no log yet at {_spec().log_path}")
+
+
+@app.command()
+def update() -> None:
+    info = updates.check(Path.cwd() / "data", force=True)
+    latest = info.get("latest")
+    if not latest:
+        _fail(RuntimeError("could not reach PyPI to check for a new version"))
+        return
+    if not info.get("newer"):
+        typer.secho(f"v{__version__} is the newest release", fg=typer.colors.GREEN)
+        return
+    method = updates.install_method()
+    typer.echo(
+        f"v{__version__} -> {latest} ({method}): {' '.join(updates.upgrade_command(method))}"
+    )
+    ok, output, _ = updates.run_upgrade(method)
+    if not ok:
+        _fail(RuntimeError(output or "upgrade failed"))
+        return
+    typer.secho(f"upgraded to {latest}", fg=typer.colors.GREEN)
+    state = background.status(background.Spec(Path.cwd(), get_settings().brain_port))
+    if state.installed:
+        typer.echo("the background service still runs the old version: brain service restart")
 
 
 @app.command()
