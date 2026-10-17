@@ -218,23 +218,8 @@ def setup_wizard(directory: Path, default_port: int, ask_browser: bool = True) -
     typer.echo("A few questions. Everything can be changed later in .env or the admin panel.")
     theme = choose_theme_and_show()
     typer.echo("")
-    typer.echo("Where will this server run?")
-    typer.echo("  1) This computer: agents on this machine, or anywhere through a tunnel")
-    typer.echo("  2) A VPS with its own domain, served over HTTPS")
-    typer.echo("  3) This computer, on your own domain through Cloudflare (free, no VPS)")
-    choice = typer.prompt("Choice", default="1").strip()
-    domain = ""
-    port = default_port
-    prefetching = False
-    if choice == "2":
-        domain = typer.prompt("Domain for the brain (e.g. brain.yourdomain.com)").strip().lower()
-        public_url = f"https://{domain}"
-    else:
-        port = typer.prompt("Port", default=default_port, type=int)
-        public_url = f"http://localhost:{port}"
-        if choice == "3":
-            prefetching = _prefetch_cloudflared(directory)
-    master_key = write_env(directory, public_url, port=port, domain=domain, theme=theme)
+    port = typer.prompt("Port for the brain on this computer", default=default_port, type=int)
+    master_key = write_env(directory, f"http://localhost:{port}", port=port, theme=theme)
     reset_settings_cache()
     typer.secho(f"\nSaved .env with a new master key: {master_key}", fg=typer.colors.GREEN)
     typer.echo(f"Folder: {directory}  (.env, data and brain_files live here)")
@@ -246,29 +231,11 @@ def setup_wizard(directory: Path, default_port: int, ask_browser: bool = True) -
             print_key(_run(lambda service: service.quick_key(purpose, None, company, None)))
         except Exception as error:
             typer.secho(f"could not create the key: {error}", fg=typer.colors.RED, err=True)
-    if domain:
-        typer.secho("\nNext steps on the VPS:", bold=True)
-        typer.echo(f"  1. DNS: add an A record for {domain} pointing at this server's public IP")
-        typer.echo("  2. Open ports 80 and 443 on the firewall")
-        typer.echo("  3. Run: docker compose up -d   (Caddy obtains the HTTPS certificate)")
-        typer.echo(
-            f"  Admin panel: https://{domain}{get_settings().admin_path}   MCP: https://{domain}/mcp"
-        )
-        if not typer.confirm(
-            "\nStart the server here now without HTTPS, for a quick test?", default=False
-        ):
-            raise typer.Exit()
-        return False
-    if choice == "3":
-        typer.secho("\nNext: type /domain in the console", bold=True)
-        typer.echo(
-            "  It checks your domain on Cloudflare, creates the tunnel and the DNS record for you, "
-            "and gives you HTTPS."
-        )
-        typer.echo(
-            "  cloudflared, Cloudflare's connector program, "
-            + ("is downloading now into data/bin." if prefetching else "is already installed.")
-        )
+    typer.echo(
+        "\nAgents on this computer can connect right away. For agents elsewhere, type /domain in "
+        "the console: it puts the brain on your own domain, from a laptop or a VPS alike, and "
+        "/service keeps it running."
+    )
     if typer.confirm(
         "\nRun the brain in the background, starting when you log in? "
         "(agents reach it even when the console is closed)",
@@ -294,12 +261,6 @@ def _install_background(directory: Path, port: int) -> bool:
     for label, value in background.describe(spec):
         typer.echo(f"  {label}: {value}")
     return True
-
-
-def _prefetch_cloudflared(directory: Path) -> bool:
-    from .cloudflare import installer
-
-    return installer(directory / "data" / "bin").start()
 
 
 def choose_theme_and_show() -> str:

@@ -37,7 +37,7 @@ def test_setup_wizard_local_creates_env_project_and_key(tmp_path, monkeypatch):
     import second_brain.cli as cli
 
     monkeypatch.chdir(tmp_path)
-    answers = iter(["1", "1", 8123, "Acme Corp", "Sales Hermes on VPS 1"])
+    answers = iter(["1", 8123, "Acme Corp", "Sales Hermes on VPS 1"])
     monkeypatch.setattr(cli.typer, "prompt", lambda *a, **k: next(answers))
     monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: True)
     printed: list[dict] = []
@@ -57,48 +57,6 @@ def test_setup_wizard_local_creates_env_project_and_key(tmp_path, monkeypatch):
     assert printed[0]["role"] == "sales" and printed[0]["mcp_url"] == "http://localhost:8123/mcp"
     assert (tmp_path / "brain_files" / "acme-corp" / "AGENT_CHANGELOG.md").is_file()
     assert installed == [8123]
-
-
-def test_setup_wizard_vps_writes_domain_and_exits(tmp_path, monkeypatch):
-    import second_brain.cli as cli
-
-    monkeypatch.chdir(tmp_path)
-    answers = iter(["1", "2", "brain.example.com"])
-    monkeypatch.setattr(cli.typer, "prompt", lambda *a, **k: next(answers))
-    monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: False)
-    cli.reset_settings_cache()
-    try:
-        try:
-            cli.setup_wizard(tmp_path, 8000)
-            raised = False
-        except cli.typer.Exit:
-            raised = True
-    finally:
-        cli.reset_settings_cache()
-    assert raised
-    env = (tmp_path / ".env").read_text(encoding="utf-8")
-    assert "BRAIN_DOMAIN=brain.example.com" in env and "PUBLIC_URL=https://brain.example.com" in env
-
-
-def test_setup_wizard_cloudflare_option_prefetches_cloudflared(tmp_path, monkeypatch):
-    import second_brain.cli as cli
-
-    monkeypatch.chdir(tmp_path)
-    answers = iter(["1", "3", 8124])
-    monkeypatch.setattr(cli.typer, "prompt", lambda *a, **k: next(answers))
-    monkeypatch.setattr(cli.typer, "confirm", lambda *a, **k: False)
-    fetched: list[str] = []
-    monkeypatch.setattr(
-        cli, "_prefetch_cloudflared", lambda directory: fetched.append(str(directory)) or True
-    )
-    cli.reset_settings_cache()
-    try:
-        assert cli.setup_wizard(tmp_path, 8000) is False
-    finally:
-        cli.reset_settings_cache()
-    env = (tmp_path / ".env").read_text(encoding="utf-8")
-    assert "PUBLIC_URL=http://localhost:8124" in env and "BRAIN_DOMAIN=\n" in env
-    assert fetched == [str(tmp_path)]
 
 
 def test_service_commands_report_state(tmp_path, monkeypatch):
