@@ -1,0 +1,51 @@
+name: Test and publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --extra dev
+      - run: uv run ruff check src tests
+      - run: mkdir -p .pytest_tmp && uv run pytest -q --basetemp=.pytest_tmp/run -p no:cacheprovider
+        env:
+          BRAIN_HOME: ${{ runner.temp }}/brain-home
+
+  publish:
+    needs: test
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Check whether this version is already on PyPI
+        id: version
+        run: |
+          version=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
+          if curl -fsS "https://pypi.org/pypi/ai-computer-brain/$version/json" >/dev/null; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+            echo "version $version is already on PyPI; nothing to publish"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+            echo "version $version is new; publishing"
+          fi
+      - if: steps.version.outputs.new == 'true'
+        run: uv build
+      - if: steps.version.outputs.new == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
